@@ -1,0 +1,29 @@
+name = "sc-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-15"
+
+[vars]
+ENVIRONMENT = "production"
+CORS_ORIGIN = "https://siliconcrane.com"
+API_VERSION = "1.2.0"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sc-db"
+database_id = "29424de8-2f7c-400f-bd23-03f8d2f390bc"
+
+[[r2_buckets]]
+binding = "ASSETS"
+bucket_name = "sc-assets"
+
+[env.preview]
+vars = { ENVIRONMENT = "preview", CORS_ORIGIN = "*" }
+
+# Secrets (set via `wrangler secret put`):
+# SC_API_KEY
+# STRIPE_SECRET_KEY
+# STRIPE_WEBHOOK_SECRET
+# GA4_API_SECRET
+# GA4_MEASUREMENT_ID
+# KIT_API_KEY
+# TURNSTILE_SECRET_KEY (Phase 2)

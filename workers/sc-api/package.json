@@ -1,0 +1,20 @@
+{
+  "name": "sc-api",
+  "version": "1.2.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev --local --port 8787",
+    "deploy": "wrangler deploy",
+    "db:migrate": "wrangler d1 execute sc-db --remote --file=migrations/0001_initial_schema.sql",
+    "db:migrate:local": "wrangler d1 execute sc-db --local --file=migrations/0001_initial_schema.sql",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "hono": "^4.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240129.0",
+    "vitest": "^1.2.0",
+    "wrangler": "^3.22.0"
+  }
+}
