@@ -89,6 +89,192 @@ app.get('/health', (c) => {
   });
 });
 
+// POST /leads (Section 4.8.2, Issue #5)
+app.post('/leads', async (c) => {
+  const requestId = c.get('requestId');
+
+  try {
+    const body = await c.req.json();
+
+    // Extract fields from request body
+    const {
+      experiment_id,
+      email,
+      name,
+      company,
+      phone,
+      custom_fields,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_term,
+      utm_content,
+      hp_field, // honeypot field
+    } = body;
+
+    // Validate required fields
+    if (!experiment_id || !email) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'INVALID_REQUEST',
+          message: 'Missing required fields: experiment_id and email are required',
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 400);
+    }
+
+    // 1. Validate experiment exists and status IN ('launch', 'run')
+    const experiment = await c.env.DB.prepare(
+      'SELECT id, slug, status FROM experiments WHERE id = ? AND status IN (?, ?)'
+    )
+      .bind(experiment_id, 'launch', 'run')
+      .first();
+
+    if (!experiment) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'EXPERIMENT_NOT_FOUND',
+          message: `Experiment '${experiment_id}' not found or not accepting leads`,
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 404);
+    }
+
+    // 2. Honeypot detection - if hp_field is non-empty, it's a bot
+    if (hp_field && hp_field.trim() !== '') {
+      console.log('Bot detected via honeypot', {
+        requestId,
+        experiment_id,
+        email,
+        hp_field,
+      });
+
+      // Return 201 with fake lead_id (don't store in DB)
+      const fakeLeadId = Math.floor(Math.random() * 1000000);
+      const successResponse: SuccessResponse = {
+        success: true,
+        data: {
+          lead_id: fakeLeadId,
+          experiment_id,
+          slug: experiment.slug,
+        },
+      };
+      return c.json(successResponse, 201);
+    }
+
+    // 3. Normalize email: lowercase and trim
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Extract additional tracking data from headers
+    const ipCountry = c.req.header('CF-IPCountry') || null;
+    const userAgent = c.req.header('User-Agent') || null;
+    const referrer = c.req.header('Referer') || null;
+
+    // 4. Try INSERT INTO leads
+    try {
+      const insertResult = await c.env.DB.prepare(
+        `INSERT INTO leads (
+          experiment_id,
+          email,
+          name,
+          company,
+          phone,
+          custom_fields,
+          utm_source,
+          utm_medium,
+          utm_campaign,
+          utm_term,
+          utm_content,
+          referrer,
+          ip_country,
+          user_agent
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+        .bind(
+          experiment_id,
+          normalizedEmail,
+          name || null,
+          company || null,
+          phone || null,
+          custom_fields ? JSON.stringify(custom_fields) : null,
+          utm_source || null,
+          utm_medium || null,
+          utm_campaign || null,
+          utm_term || null,
+          utm_content || null,
+          referrer,
+          ipCountry,
+          userAgent
+        )
+        .run();
+
+      // Get the inserted lead_id
+      const leadId = insertResult.meta.last_row_id;
+
+      // 6. Return 201 with lead_id, experiment_id, slug
+      const successResponse: SuccessResponse = {
+        success: true,
+        data: {
+          lead_id: leadId,
+          experiment_id,
+          slug: experiment.slug,
+        },
+      };
+
+      console.log('Lead created successfully', {
+        requestId,
+        leadId,
+        experiment_id,
+        email: normalizedEmail,
+      });
+
+      return c.json(successResponse, 201);
+    } catch (dbError: unknown) {
+      // 5. Check for UNIQUE constraint violation (duplicate lead)
+      const errorMessage =
+        dbError instanceof Error ? dbError.message : String(dbError);
+
+      if (
+        errorMessage.includes('UNIQUE constraint failed') ||
+        errorMessage.includes('unique constraint')
+      ) {
+        const errorResponse: ErrorResponse = {
+          success: false,
+          error: {
+            code: 'DUPLICATE_LEAD',
+            message: `Lead with email '${normalizedEmail}' already exists for this experiment`,
+            request_id: requestId,
+          },
+        };
+        return c.json(errorResponse, 409);
+      }
+
+      // Re-throw other database errors
+      throw dbError;
+    }
+  } catch (error) {
+    console.error('Lead creation failed', {
+      requestId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+
+    const errorResponse: ErrorResponse = {
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to create lead',
+        request_id: requestId,
+      },
+    };
+    return c.json(errorResponse, 500);
+  }
+});
+
 // 404 handler
 app.notFound((c) => {
   const errorResponse: ErrorResponse = {
