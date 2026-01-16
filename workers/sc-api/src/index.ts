@@ -89,6 +89,76 @@ app.get('/health', (c) => {
   });
 });
 
+// GET /experiments/by-slug/:slug (Section 4.8.4, Issue #4)
+app.get('/experiments/by-slug/:slug', async (c) => {
+  const slug = c.req.param('slug');
+  const requestId = c.get('requestId');
+
+  try {
+    // Query experiments with slug and status in ('launch', 'run')
+    const result = await c.env.DB.prepare(
+      'SELECT * FROM experiments WHERE slug = ? AND status IN (?, ?)'
+    )
+      .bind(slug, 'launch', 'run')
+      .first();
+
+    // If no result, return 404
+    if (!result) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'EXPERIMENT_NOT_FOUND',
+          message: `Experiment with slug '${slug}' not found or not available`,
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 404);
+    }
+
+    // Sanitize response to only include public fields
+    const sanitizedExperiment: Record<string, unknown> = {
+      id: result.id,
+      name: result.name,
+      slug: result.slug,
+      status: result.status,
+      archetype: result.archetype,
+      copy_pack: result.copy_pack,
+      created_at: result.created_at,
+    };
+
+    // Include pricing fields if experiment is priced
+    if (result.price_cents !== null && result.price_cents !== undefined) {
+      sanitizedExperiment.price_cents = result.price_cents;
+    }
+    if (result.stripe_price_id) {
+      sanitizedExperiment.stripe_price_id = result.stripe_price_id;
+    }
+
+    const successResponse: SuccessResponse = {
+      success: true,
+      data: sanitizedExperiment,
+    };
+
+    return c.json(successResponse, 200);
+  } catch (error) {
+    console.error('Database query failed', {
+      requestId,
+      slug,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+
+    const errorResponse: ErrorResponse = {
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to retrieve experiment',
+        request_id: requestId,
+      },
+    };
+    return c.json(errorResponse, 500);
+  }
+});
+
 // 404 handler
 app.notFound((c) => {
   const errorResponse: ErrorResponse = {
