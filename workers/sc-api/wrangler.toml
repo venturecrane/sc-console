@@ -17,7 +17,16 @@ binding = "ASSETS"
 bucket_name = "sc-assets"
 
 [env.preview]
-vars = { ENVIRONMENT = "preview", CORS_ORIGIN = "*" }
+vars = { ENVIRONMENT = "preview", CORS_ORIGIN = "*", API_VERSION = "1.2.0" }
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "sc-db"
+database_id = "29424de8-2f7c-400f-bd23-03f8d2f390bc"
+
+[[env.preview.r2_buckets]]
+binding = "ASSETS"
+bucket_name = "sc-assets"
 
 # Secrets (set via `wrangler secret put`):
 # SC_API_KEY
