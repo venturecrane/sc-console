@@ -7,6 +7,9 @@
     "deploy": "wrangler deploy",
     "db:migrate": "wrangler d1 execute sc-db --remote --file=migrations/0001_initial_schema.sql",
     "db:migrate:local": "wrangler d1 execute sc-db --local --file=migrations/0001_initial_schema.sql",
+    "db:seed": "wrangler d1 execute sc-db --remote --file=migrations/seed.sql",
+    "db:seed:local": "wrangler d1 execute sc-db --local --file=migrations/seed.sql",
+    "db:reset:local": "wrangler d1 execute sc-db --local --file=migrations/0001_initial_schema.sql && wrangler d1 execute sc-db --local --file=migrations/seed.sql",
     "test": "vitest"
   },
   "dependencies": {
