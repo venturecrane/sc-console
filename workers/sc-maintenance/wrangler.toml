@@ -1,0 +1,19 @@
+name = "sc-maintenance"
+main = "src/index.ts"
+compatibility_date = "2024-01-15"
+
+[triggers]
+crons = ["0 2 * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sc-db"
+database_id = "29424de8-2f7c-400f-bd23-03f8d2f390bc"
+
+[env.preview]
+name = "sc-maintenance-preview"
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "sc-db"
+database_id = "29424de8-2f7c-400f-bd23-03f8d2f390bc"
