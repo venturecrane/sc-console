@@ -1,0 +1,15 @@
+{
+  "name": "sc-maintenance",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev --local",
+    "deploy": "wrangler deploy",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240129.0",
+    "vitest": "^1.2.0",
+    "wrangler": "^3.22.0"
+  }
+}

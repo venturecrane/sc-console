@@ -1,0 +1,21 @@
+{
+  "name": "sc-coda-pack",
+  "version": "1.0.0",
+  "description": "Coda Pack for Silicon Crane experiment management",
+  "private": true,
+  "main": "pack.ts",
+  "scripts": {
+    "build": "coda build",
+    "validate": "coda validate",
+    "execute": "coda execute",
+    "auth": "coda auth",
+    "upload": "coda upload",
+    "release": "coda release"
+  },
+  "dependencies": {
+    "@codahq/packs-sdk": "^1.12.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  }
+}
