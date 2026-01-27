@@ -1,0 +1,225 @@
+---
+import Base from '../layouts/Base.astro';
+
+export const prerender = true;
+---
+
+<Base
+  title="About - Silicon Crane"
+  description="Silicon Crane helps founders and product teams validate business ideas through rapid market experiments. Learn about our mission and approach."
+  ogTitle="About Silicon Crane"
+  ogDescription="We help founders validate business ideas through rapid market experiments."
+>
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-br from-crane-50 via-white to-blue-50 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl">
+        <span class="text-crane-600 font-semibold uppercase tracking-wider text-sm">About Us</span>
+        <h1 class="mt-4 text-4xl md:text-5xl font-bold text-gray-900">
+          We believe in building the right thing
+        </h1>
+        <p class="mt-6 text-xl text-gray-600">
+          Silicon Crane exists to help founders avoid the most common startup mistake:
+          building products nobody wants.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 class="text-3xl font-bold text-gray-900">Our Mission</h2>
+          <p class="mt-6 text-lg text-gray-600">
+            Every year, founders pour their savings, their time, and their energy into
+            building products based on assumptions. Most fail not because they could not
+            build what they imagined, but because they imagined the wrong thing.
+          </p>
+          <p class="mt-4 text-lg text-gray-600">
+            We are on a mission to flip the script. Validate first, build second.
+            Test your riskiest assumptions before you commit months of development time.
+            Get real market feedback from real potential customers.
+          </p>
+          <p class="mt-4 text-lg text-gray-600">
+            When you know what the market wants, you can build with confidence instead of hope.
+          </p>
+        </div>
+        <div class="bg-gradient-to-br from-crane-100 to-blue-100 rounded-2xl p-8 md:p-12">
+          <blockquote class="text-2xl font-medium text-gray-900 italic">
+            "The only way to win is to learn faster than anyone else."
+          </blockquote>
+          <p class="mt-4 text-gray-600">- Eric Ries, The Lean Startup</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values Section -->
+  <section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Our Values</h2>
+        <p class="mt-6 text-lg text-gray-600">
+          These principles guide everything we do.
+        </p>
+      </div>
+
+      <div class="mt-16 grid md:grid-cols-3 gap-8">
+        <!-- Value 1 -->
+        <div class="bg-white rounded-xl p-8 shadow-sm">
+          <div class="w-12 h-12 bg-crane-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-crane-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 class="mt-6 text-xl font-semibold text-gray-900">Truth Over Comfort</h3>
+          <p class="mt-4 text-gray-600">
+            We would rather tell you your idea does not have market demand than watch you spend
+            six months building something nobody wants. The market does not care about feelings.
+          </p>
+        </div>
+
+        <!-- Value 2 -->
+        <div class="bg-white rounded-xl p-8 shadow-sm">
+          <div class="w-12 h-12 bg-crane-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-crane-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h3 class="mt-6 text-xl font-semibold text-gray-900">Speed Over Perfection</h3>
+          <p class="mt-4 text-gray-600">
+            A fast experiment that gives you a clear signal is worth more than a perfect
+            experiment that takes too long. We optimize for learning velocity.
+          </p>
+        </div>
+
+        <!-- Value 3 -->
+        <div class="bg-white rounded-xl p-8 shadow-sm">
+          <div class="w-12 h-12 bg-crane-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-crane-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h3 class="mt-6 text-xl font-semibold text-gray-900">Data Over Opinions</h3>
+          <p class="mt-4 text-gray-600">
+            Every experiment has clear success criteria defined upfront. We do not argue about
+            what the results mean - we let the numbers speak.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Approach Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Our Approach</h2>
+        <p class="mt-6 text-lg text-gray-600">
+          We have taken the best practices from lean startup methodology, growth marketing,
+          and product management and distilled them into a repeatable validation framework.
+        </p>
+        <div class="mt-12 space-y-8">
+          <div class="flex gap-6">
+            <div class="flex-shrink-0 w-10 h-10 bg-crane-100 rounded-full flex items-center justify-center">
+              <span class="text-crane-600 font-bold">1</span>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-gray-900">Hypothesis-Driven</h3>
+              <p class="mt-2 text-gray-600">
+                Every experiment starts with a clear, testable hypothesis. "We believe [customer segment]
+                will [take action] because [reason]." No fuzzy thinking allowed.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-6">
+            <div class="flex-shrink-0 w-10 h-10 bg-crane-100 rounded-full flex items-center justify-center">
+              <span class="text-crane-600 font-bold">2</span>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-gray-900">Pre-Defined Success Criteria</h3>
+              <p class="mt-2 text-gray-600">
+                Before we start, we agree on what "good" looks like. Conversion rates, cost per lead,
+                willingness to pay - whatever metrics matter for your hypothesis.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-6">
+            <div class="flex-shrink-0 w-10 h-10 bg-crane-100 rounded-full flex items-center justify-center">
+              <span class="text-crane-600 font-bold">3</span>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-gray-900">Minimum Viable Experiment</h3>
+              <p class="mt-2 text-gray-600">
+                We build the smallest thing that can test your hypothesis. Landing pages, not products.
+                Ads, not organic growth. Speed is the competitive advantage.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-6">
+            <div class="flex-shrink-0 w-10 h-10 bg-crane-100 rounded-full flex items-center justify-center">
+              <span class="text-crane-600 font-bold">4</span>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-gray-900">Decisive Outcomes</h3>
+              <p class="mt-2 text-gray-600">
+                Every experiment ends with a clear recommendation: GO, KILL, or PIVOT.
+                No "it depends" or "needs more research." You get actionable clarity.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Silicon Crane Section -->
+  <section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Why "Silicon Crane"?</h2>
+        <p class="mt-6 text-lg text-gray-600">
+          The crane is a symbol of patience, focus, and precision. In Japanese culture,
+          it represents good fortune and longevity - earned through careful, deliberate action.
+        </p>
+        <p class="mt-4 text-lg text-gray-600">
+          Like the crane, we believe in standing still to observe before making a move.
+          In understanding the landscape before committing to a direction.
+          In the power of patient precision over hasty action.
+        </p>
+        <p class="mt-4 text-lg text-gray-600">
+          "Silicon" grounds us in the technology world we serve.
+          Together, Silicon Crane represents thoughtful technology building -
+          validation before velocity, understanding before action.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-crane-600">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-white">
+          Ready to validate your idea?
+        </h2>
+        <p class="mt-6 text-xl text-crane-100">
+          Let us help you find out if customers want what you are planning to build.
+        </p>
+        <div class="mt-10">
+          <a
+            href="mailto:hello@siliconcrane.com"
+            class="inline-flex items-center justify-center px-8 py-4 bg-white text-crane-600 rounded-lg hover:bg-gray-100 transition-colors font-semibold text-lg shadow-lg"
+          >
+            Get In Touch
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

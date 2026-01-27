@@ -1,0 +1,321 @@
+---
+import Base from '../layouts/Base.astro';
+
+export const prerender = true;
+---
+
+<Base
+  title="Services - Silicon Crane"
+  description="Our validation services help founders test business hypotheses with rapid experiments. Waitlists, presales, concierge pilots, and more."
+  ogTitle="Silicon Crane Services"
+  ogDescription="Rapid market validation services for founders and product teams."
+>
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-br from-crane-50 via-white to-blue-50 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl">
+        <span class="text-crane-600 font-semibold uppercase tracking-wider text-sm">Our Services</span>
+        <h1 class="mt-4 text-4xl md:text-5xl font-bold text-gray-900">
+          Validation sprints for every stage
+        </h1>
+        <p class="mt-6 text-xl text-gray-600">
+          Choose the experiment type that matches your hypothesis. Each sprint is designed
+          to give you a clear GO/KILL/PIVOT decision.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experiment Types -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid gap-12">
+        <!-- Waitlist Experiment -->
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+              Low Commitment
+            </span>
+            <h2 class="mt-4 text-3xl font-bold text-gray-900">Waitlist Validation</h2>
+            <p class="mt-4 text-lg text-gray-600">
+              Test interest in your concept with a simple email capture. Perfect for early-stage
+              ideas where you want to gauge initial demand before building anything.
+            </p>
+            <ul class="mt-6 space-y-3">
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-crane-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-gray-600">Landing page with compelling value proposition</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-crane-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-gray-600">Traffic acquisition via targeted ads</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-crane-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-gray-600">Conversion rate analysis and benchmarking</span>
+              </li>
+            </ul>
+            <div class="mt-8">
+              <span class="text-sm text-gray-500">Best for:</span>
+              <span class="ml-2 text-sm font-medium text-gray-900">Testing problem/solution resonance</span>
+            </div>
+          </div>
+          <div class="bg-gray-50 rounded-2xl p-8">
+            <div class="text-center">
+              <div class="text-4xl font-bold text-crane-600">2 weeks</div>
+              <div class="mt-2 text-gray-600">Average sprint duration</div>
+              <div class="mt-6 text-sm text-gray-500">
+                Success signal: &gt;5% conversion rate from ad to signup
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-gray-200" />
+
+        <!-- Priced Waitlist Experiment -->
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div class="md:order-2">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+              Medium Commitment
+            </span>
+            <h2 class="mt-4 text-3xl font-bold text-gray-900">Priced Waitlist</h2>
+            <p class="mt-4 text-lg text-gray-600">
+              Go beyond interest to validate willingness to pay. Capture credit cards with
+              a small deposit to prove real purchase intent.
+            </p>
+            <ul class="mt-6 space-y-3">
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-crane-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-gray-600">Stripe-integrated payment collection</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-crane-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-gray-600">Refundable deposit model (typically $10-50)</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-crane-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-gray-600">True purchase intent validation</span>
+              </li>
+            </ul>
+            <div class="mt-8">
+              <span class="text-sm text-gray-500">Best for:</span>
+              <span class="ml-2 text-sm font-medium text-gray-900">Validating willingness to pay</span>
+            </div>
+          </div>
+          <div class="bg-gray-50 rounded-2xl p-8 md:order-1">
+            <div class="text-center">
+              <div class="text-4xl font-bold text-crane-600">3 weeks</div>
+              <div class="mt-2 text-gray-600">Average sprint duration</div>
+              <div class="mt-6 text-sm text-gray-500">
+                Success signal: &gt;2% conversion from visitor to paid deposit
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-gray-200" />
+
+        <!-- Presale Experiment -->
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+              High Commitment
+            </span>
+            <h2 class="mt-4 text-3xl font-bold text-gray-900">Presale Validation</h2>
+            <p class="mt-4 text-lg text-gray-600">
+              The ultimate validation: actual revenue before the product exists.
+              Pre-sell your product at full price with a delivery timeline.
+            </p>
+            <ul class="mt-6 space-y-3">
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-crane-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-gray-600">Full-price payment collection</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-crane-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-gray-600">Delivery timeline and refund policy</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-crane-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-gray-600">Revenue-funded development potential</span>
+              </li>
+            </ul>
+            <div class="mt-8">
+              <span class="text-sm text-gray-500">Best for:</span>
+              <span class="ml-2 text-sm font-medium text-gray-900">Funding development with customer revenue</span>
+            </div>
+          </div>
+          <div class="bg-gray-50 rounded-2xl p-8">
+            <div class="text-center">
+              <div class="text-4xl font-bold text-crane-600">4 weeks</div>
+              <div class="mt-2 text-gray-600">Average sprint duration</div>
+              <div class="mt-6 text-sm text-gray-500">
+                Success signal: Revenue covers minimum viable build cost
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-gray-200" />
+
+        <!-- Concierge Experiment -->
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div class="md:order-2">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+              Service Pilot
+            </span>
+            <h2 class="mt-4 text-3xl font-bold text-gray-900">Concierge MVP</h2>
+            <p class="mt-4 text-lg text-gray-600">
+              Deliver your product value manually to a small group of customers.
+              Perfect for service businesses or complex products.
+            </p>
+            <ul class="mt-6 space-y-3">
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-crane-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-gray-600">Manual delivery of the core value proposition</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-crane-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-gray-600">Deep customer feedback and iteration</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-crane-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-gray-600">Identify what to automate vs. keep human</span>
+              </li>
+            </ul>
+            <div class="mt-8">
+              <span class="text-sm text-gray-500">Best for:</span>
+              <span class="ml-2 text-sm font-medium text-gray-900">Complex products or services</span>
+            </div>
+          </div>
+          <div class="bg-gray-50 rounded-2xl p-8 md:order-1">
+            <div class="text-center">
+              <div class="text-4xl font-bold text-crane-600">4-6 weeks</div>
+              <div class="mt-2 text-gray-600">Average sprint duration</div>
+              <div class="mt-6 text-sm text-gray-500">
+                Success signal: Repeat usage and referrals
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Process Section -->
+  <section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto">
+        <span class="text-crane-600 font-semibold uppercase tracking-wider text-sm">Our Process</span>
+        <h2 class="mt-4 text-3xl md:text-4xl font-bold text-gray-900">
+          Every sprint follows the same rigorous framework
+        </h2>
+      </div>
+
+      <div class="mt-16 relative">
+        <div class="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-crane-200"></div>
+
+        <div class="space-y-12 relative">
+          <!-- Step 1 -->
+          <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div class="text-right md:pr-12">
+              <span class="text-crane-600 font-bold text-xl">Day 1-2</span>
+              <h3 class="mt-2 text-2xl font-bold text-gray-900">Distill Brief</h3>
+              <p class="mt-4 text-gray-600">
+                We work with you to articulate the hypothesis, define success metrics,
+                and set clear kill criteria. No ambiguity.
+              </p>
+            </div>
+            <div class="hidden md:block"></div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div class="hidden md:block"></div>
+            <div class="md:pl-12">
+              <span class="text-crane-600 font-bold text-xl">Day 3-5</span>
+              <h3 class="mt-2 text-2xl font-bold text-gray-900">Build Assets</h3>
+              <p class="mt-4 text-gray-600">
+                We create the landing page, ad creatives, and tracking infrastructure.
+                Everything needed to run a clean experiment.
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div class="text-right md:pr-12">
+              <span class="text-crane-600 font-bold text-xl">Day 6-14+</span>
+              <h3 class="mt-2 text-2xl font-bold text-gray-900">Run Experiment</h3>
+              <p class="mt-4 text-gray-600">
+                Traffic flows, data accumulates. We monitor daily and share
+                weekly learning memos on what we are seeing.
+              </p>
+            </div>
+            <div class="hidden md:block"></div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div class="hidden md:block"></div>
+            <div class="md:pl-12">
+              <span class="text-crane-600 font-bold text-xl">Final Day</span>
+              <h3 class="mt-2 text-2xl font-bold text-gray-900">Decision Memo</h3>
+              <p class="mt-4 text-gray-600">
+                You get a clear recommendation: GO, KILL, or PIVOT. Backed by data,
+                not opinions. Along with suggested next steps.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-crane-600">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-white">
+          Which experiment is right for your idea?
+        </h2>
+        <p class="mt-6 text-xl text-crane-100">
+          Let us help you choose the validation approach that will give you the clearest signal.
+        </p>
+        <div class="mt-10">
+          <a
+            href="mailto:hello@siliconcrane.com"
+            class="inline-flex items-center justify-center px-8 py-4 bg-white text-crane-600 rounded-lg hover:bg-gray-100 transition-colors font-semibold text-lg shadow-lg"
+          >
+            Schedule a Free Consultation
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
