@@ -968,6 +968,596 @@ app.patch('/experiments/:id', async (c) => {
   }
 });
 
+// GET /experiments/:id/leads (Issue #9)
+// Internal endpoint - requires X-SC-Key
+// Supports cursor pagination and status filter
+app.get('/experiments/:id/leads', async (c) => {
+  const requestId = c.get('requestId');
+  const experimentId = c.req.param('id');
+
+  try {
+    // Verify experiment exists
+    const experiment = await c.env.DB.prepare('SELECT id FROM experiments WHERE id = ?')
+      .bind(experimentId)
+      .first();
+
+    if (!experiment) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'EXPERIMENT_NOT_FOUND',
+          message: `Experiment '${experimentId}' not found`,
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 404);
+    }
+
+    // Parse query parameters
+    const status = c.req.query('status');
+    const limitParam = c.req.query('limit');
+    const cursor = c.req.query('cursor');
+
+    // Validate and set limit (default 20, max 100)
+    let limit = 20;
+    if (limitParam) {
+      const parsedLimit = parseInt(limitParam, 10);
+      if (isNaN(parsedLimit) || parsedLimit < 1) {
+        const errorResponse: ErrorResponse = {
+          success: false,
+          error: {
+            code: 'INVALID_REQUEST',
+            message: 'Invalid limit parameter',
+            request_id: requestId,
+          },
+        };
+        return c.json(errorResponse, 400);
+      }
+      limit = Math.min(parsedLimit, 100);
+    }
+
+    // Validate status if provided
+    const validStatuses = ['new', 'qualified', 'scheduled', 'closed_won', 'closed_lost', 'disqualified'];
+    if (status && !validStatuses.includes(status)) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'INVALID_REQUEST',
+          message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`,
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 400);
+    }
+
+    // Decode cursor if provided (base64-encoded JSON with id and created_at)
+    let cursorData: { id: number; created_at: number } | null = null;
+    if (cursor) {
+      try {
+        cursorData = JSON.parse(atob(cursor));
+      } catch {
+        const errorResponse: ErrorResponse = {
+          success: false,
+          error: {
+            code: 'INVALID_REQUEST',
+            message: 'Invalid cursor format',
+            request_id: requestId,
+          },
+        };
+        return c.json(errorResponse, 400);
+      }
+    }
+
+    // Build query with parameterized bindings
+    let query = 'SELECT * FROM leads WHERE experiment_id = ?';
+    const bindings: (string | number)[] = [experimentId];
+
+    // Add status filter
+    if (status) {
+      query += ' AND status = ?';
+      bindings.push(status);
+    }
+
+    // Add cursor-based pagination (created_at DESC, id DESC)
+    if (cursorData) {
+      query += ' AND (created_at < ? OR (created_at = ? AND id < ?))';
+      bindings.push(cursorData.created_at, cursorData.created_at, cursorData.id);
+    }
+
+    // Order by created_at DESC, id DESC for consistent pagination
+    query += ' ORDER BY created_at DESC, id DESC LIMIT ?';
+    bindings.push(limit + 1); // Fetch one extra to determine has_more
+
+    // Execute query
+    const result = await c.env.DB.prepare(query).bind(...bindings).all();
+    const leads = result.results || [];
+
+    // Determine pagination
+    const hasMore = leads.length > limit;
+    const items = hasMore ? leads.slice(0, limit) : leads;
+
+    // Generate next_cursor from last item
+    let nextCursor: string | null = null;
+    if (hasMore && items.length > 0) {
+      const lastItem = items[items.length - 1];
+      nextCursor = btoa(JSON.stringify({
+        id: lastItem.id,
+        created_at: lastItem.created_at,
+      }));
+    }
+
+    const successResponse: SuccessResponse = {
+      success: true,
+      data: {
+        items,
+        next_cursor: nextCursor,
+        has_more: hasMore,
+      },
+    };
+
+    return c.json(successResponse, 200);
+  } catch (error) {
+    console.error('List leads failed', {
+      requestId,
+      experimentId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+
+    const errorResponse: ErrorResponse = {
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to list leads',
+        request_id: requestId,
+      },
+    };
+    return c.json(errorResponse, 500);
+  }
+});
+
+// GET /experiments/:id/decision_memos (Issue #11)
+// Internal endpoint - requires X-SC-Key
+app.get('/experiments/:id/decision_memos', async (c) => {
+  const requestId = c.get('requestId');
+  const experimentId = c.req.param('id');
+
+  try {
+    // Verify experiment exists
+    const experiment = await c.env.DB.prepare('SELECT id FROM experiments WHERE id = ?')
+      .bind(experimentId)
+      .first();
+
+    if (!experiment) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'EXPERIMENT_NOT_FOUND',
+          message: `Experiment '${experimentId}' not found`,
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 404);
+    }
+
+    // Get all decision memos for this experiment, ordered by created_at DESC
+    const result = await c.env.DB.prepare(
+      'SELECT * FROM decision_memos WHERE experiment_id = ? ORDER BY created_at DESC'
+    )
+      .bind(experimentId)
+      .all();
+
+    const memos = result.results || [];
+
+    // Parse JSON fields
+    const parsedMemos = memos.map((memo) => ({
+      ...memo,
+      key_metrics: memo.key_metrics ? JSON.parse(memo.key_metrics as string) : null,
+    }));
+
+    const successResponse: SuccessResponse = {
+      success: true,
+      data: {
+        items: parsedMemos,
+      },
+    };
+
+    return c.json(successResponse, 200);
+  } catch (error) {
+    console.error('List decision memos failed', {
+      requestId,
+      experimentId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+
+    const errorResponse: ErrorResponse = {
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to list decision memos',
+        request_id: requestId,
+      },
+    };
+    return c.json(errorResponse, 500);
+  }
+});
+
+// POST /experiments/:id/decision_memos (Issue #11)
+// Internal endpoint - requires X-SC-Key
+app.post('/experiments/:id/decision_memos', async (c) => {
+  const requestId = c.get('requestId');
+  const experimentId = c.req.param('id');
+
+  try {
+    // Verify experiment exists
+    const experiment = await c.env.DB.prepare('SELECT id FROM experiments WHERE id = ?')
+      .bind(experimentId)
+      .first();
+
+    if (!experiment) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'EXPERIMENT_NOT_FOUND',
+          message: `Experiment '${experimentId}' not found`,
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 404);
+    }
+
+    const body = await c.req.json();
+    const { decision, confidence_pct, rationale, key_metrics, next_steps, author } = body;
+
+    // Validate required fields
+    if (!decision || !rationale) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'INVALID_REQUEST',
+          message: 'Missing required fields: decision and rationale are required',
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 400);
+    }
+
+    // Validate decision value
+    const validDecisions = ['GO', 'KILL', 'PIVOT', 'INVALID'];
+    if (!validDecisions.includes(decision)) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'INVALID_REQUEST',
+          message: `Invalid decision. Must be one of: ${validDecisions.join(', ')}`,
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 400);
+    }
+
+    // Validate confidence_pct if provided
+    if (confidence_pct !== undefined && confidence_pct !== null) {
+      if (typeof confidence_pct !== 'number' || confidence_pct < 0 || confidence_pct > 100) {
+        const errorResponse: ErrorResponse = {
+          success: false,
+          error: {
+            code: 'INVALID_REQUEST',
+            message: 'confidence_pct must be a number between 0 and 100',
+            request_id: requestId,
+          },
+        };
+        return c.json(errorResponse, 400);
+      }
+    }
+
+    // Insert decision memo
+    const insertResult = await c.env.DB.prepare(
+      `INSERT INTO decision_memos (
+        experiment_id,
+        decision,
+        confidence_pct,
+        rationale,
+        key_metrics,
+        next_steps,
+        author
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)`
+    )
+      .bind(
+        experimentId,
+        decision,
+        confidence_pct ?? null,
+        rationale,
+        key_metrics ? JSON.stringify(key_metrics) : null,
+        next_steps || null,
+        author || null
+      )
+      .run();
+
+    const memoId = insertResult.meta.last_row_id;
+
+    // Fetch the created memo
+    const createdMemo = await c.env.DB.prepare('SELECT * FROM decision_memos WHERE id = ?')
+      .bind(memoId)
+      .first();
+
+    // Parse JSON fields
+    const parsedMemo = {
+      ...createdMemo,
+      key_metrics: createdMemo?.key_metrics ? JSON.parse(createdMemo.key_metrics as string) : null,
+    };
+
+    const successResponse: SuccessResponse = {
+      success: true,
+      data: parsedMemo,
+    };
+
+    console.log('Decision memo created successfully', {
+      requestId,
+      memoId,
+      experimentId,
+      decision,
+    });
+
+    return c.json(successResponse, 201);
+  } catch (error) {
+    console.error('Create decision memo failed', {
+      requestId,
+      experimentId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+
+    const errorResponse: ErrorResponse = {
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to create decision memo',
+        request_id: requestId,
+      },
+    };
+    return c.json(errorResponse, 500);
+  }
+});
+
+// GET /experiments/:id/learning_memos (Issue #12)
+// Internal endpoint - requires X-SC-Key
+app.get('/experiments/:id/learning_memos', async (c) => {
+  const requestId = c.get('requestId');
+  const experimentId = c.req.param('id');
+
+  try {
+    // Verify experiment exists
+    const experiment = await c.env.DB.prepare('SELECT id FROM experiments WHERE id = ?')
+      .bind(experimentId)
+      .first();
+
+    if (!experiment) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'EXPERIMENT_NOT_FOUND',
+          message: `Experiment '${experimentId}' not found`,
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 404);
+    }
+
+    // Get all learning memos for this experiment, ordered by week_number ASC
+    const result = await c.env.DB.prepare(
+      'SELECT * FROM learning_memos WHERE experiment_id = ? ORDER BY week_number ASC'
+    )
+      .bind(experimentId)
+      .all();
+
+    const memos = result.results || [];
+
+    // Parse JSON fields
+    const parsedMemos = memos.map((memo) => ({
+      ...memo,
+      metrics_snapshot: memo.metrics_snapshot ? JSON.parse(memo.metrics_snapshot as string) : null,
+    }));
+
+    const successResponse: SuccessResponse = {
+      success: true,
+      data: {
+        items: parsedMemos,
+      },
+    };
+
+    return c.json(successResponse, 200);
+  } catch (error) {
+    console.error('List learning memos failed', {
+      requestId,
+      experimentId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+
+    const errorResponse: ErrorResponse = {
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to list learning memos',
+        request_id: requestId,
+      },
+    };
+    return c.json(errorResponse, 500);
+  }
+});
+
+// POST /experiments/:id/learning_memos (Issue #12)
+// Internal endpoint - requires X-SC-Key
+app.post('/experiments/:id/learning_memos', async (c) => {
+  const requestId = c.get('requestId');
+  const experimentId = c.req.param('id');
+
+  try {
+    // Verify experiment exists
+    const experiment = await c.env.DB.prepare('SELECT id FROM experiments WHERE id = ?')
+      .bind(experimentId)
+      .first();
+
+    if (!experiment) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'EXPERIMENT_NOT_FOUND',
+          message: `Experiment '${experimentId}' not found`,
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 404);
+    }
+
+    const body = await c.req.json();
+    const {
+      week_number,
+      week_start,
+      week_end,
+      observations,
+      hypotheses,
+      actions_taken,
+      next_week_plan,
+      metrics_snapshot,
+      author,
+    } = body;
+
+    // Validate required fields
+    if (!week_number || !week_start || !week_end || !observations) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'INVALID_REQUEST',
+          message: 'Missing required fields: week_number, week_start, week_end, and observations are required',
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 400);
+    }
+
+    // Validate week_number is a positive integer
+    if (typeof week_number !== 'number' || week_number < 1 || !Number.isInteger(week_number)) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'INVALID_REQUEST',
+          message: 'week_number must be a positive integer',
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 400);
+    }
+
+    // Validate date format (YYYY-MM-DD)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(week_start) || !dateRegex.test(week_end)) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'INVALID_REQUEST',
+          message: 'week_start and week_end must be in ISO 8601 date format (YYYY-MM-DD)',
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 400);
+    }
+
+    // Insert learning memo
+    try {
+      const insertResult = await c.env.DB.prepare(
+        `INSERT INTO learning_memos (
+          experiment_id,
+          week_number,
+          week_start,
+          week_end,
+          observations,
+          hypotheses,
+          actions_taken,
+          next_week_plan,
+          metrics_snapshot,
+          author
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+        .bind(
+          experimentId,
+          week_number,
+          week_start,
+          week_end,
+          observations,
+          hypotheses || null,
+          actions_taken || null,
+          next_week_plan || null,
+          metrics_snapshot ? JSON.stringify(metrics_snapshot) : null,
+          author || null
+        )
+        .run();
+
+      const memoId = insertResult.meta.last_row_id;
+
+      // Fetch the created memo
+      const createdMemo = await c.env.DB.prepare('SELECT * FROM learning_memos WHERE id = ?')
+        .bind(memoId)
+        .first();
+
+      // Parse JSON fields
+      const parsedMemo = {
+        ...createdMemo,
+        metrics_snapshot: createdMemo?.metrics_snapshot ? JSON.parse(createdMemo.metrics_snapshot as string) : null,
+      };
+
+      const successResponse: SuccessResponse = {
+        success: true,
+        data: parsedMemo,
+      };
+
+      console.log('Learning memo created successfully', {
+        requestId,
+        memoId,
+        experimentId,
+        week_number,
+      });
+
+      return c.json(successResponse, 201);
+    } catch (dbError: unknown) {
+      // Check for UNIQUE constraint violation (duplicate week_number for experiment)
+      const errorMessage = dbError instanceof Error ? dbError.message : String(dbError);
+
+      if (
+        errorMessage.includes('UNIQUE constraint failed') ||
+        errorMessage.includes('unique constraint')
+      ) {
+        const errorResponse: ErrorResponse = {
+          success: false,
+          error: {
+            code: 'DUPLICATE_WEEK',
+            message: `Learning memo for week ${week_number} already exists for this experiment`,
+            request_id: requestId,
+          },
+        };
+        return c.json(errorResponse, 409);
+      }
+
+      // Re-throw other database errors
+      throw dbError;
+    }
+  } catch (error) {
+    console.error('Create learning memo failed', {
+      requestId,
+      experimentId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+
+    const errorResponse: ErrorResponse = {
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to create learning memo',
+        request_id: requestId,
+      },
+    };
+    return c.json(errorResponse, 500);
+  }
+});
+
 // POST /payments/webhook (Section 4.8.5, Issue #8)
 // Public endpoint - uses Stripe signature verification
 app.post('/payments/webhook', async (c) => {

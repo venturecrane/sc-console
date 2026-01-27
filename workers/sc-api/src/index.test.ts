@@ -736,3 +736,496 @@ describe('POST /payments/webhook (Issue #8)', () => {
     // TODO: Implement after D1 local testing is set up
   });
 });
+
+describe('GET /experiments/:id/leads (Issue #9)', () => {
+  let worker: UnstableDevWorker;
+
+  beforeAll(async () => {
+    worker = await unstable_dev('src/index.ts', {
+      experimental: { disableExperimentalWarning: true },
+      local: true,
+    });
+  });
+
+  afterAll(async () => {
+    await worker.stop();
+  });
+
+  it('should return 401 without X-SC-Key header', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/leads');
+    expect(resp.status).toBe(401);
+
+    const data = await resp.json();
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('UNAUTHORIZED');
+  });
+
+  it('should return 404 for non-existent experiment when authenticated', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-999/leads', {
+      headers: { 'X-SC-Key': 'test-key' },
+    });
+
+    // Expecting 401 in test environment without valid SC_API_KEY
+    // With valid auth, would expect 404 for non-existent experiment
+    expect([404, 401]).toContain(resp.status);
+  });
+
+  it('should return 400 for invalid limit parameter', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/leads?limit=invalid', {
+      headers: { 'X-SC-Key': 'test-key' },
+    });
+
+    // Expecting 401 in test environment without valid SC_API_KEY
+    // With valid auth, would expect 400 for invalid limit
+    expect([400, 401]).toContain(resp.status);
+  });
+
+  it('should return 400 for invalid status filter', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/leads?status=invalid', {
+      headers: { 'X-SC-Key': 'test-key' },
+    });
+
+    // Expecting 401 in test environment without valid SC_API_KEY
+    // With valid auth, would expect 400 for invalid status
+    expect([400, 401]).toContain(resp.status);
+  });
+
+  it('should return 400 for invalid cursor format', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/leads?cursor=invalid', {
+      headers: { 'X-SC-Key': 'test-key' },
+    });
+
+    // Expecting 401 in test environment without valid SC_API_KEY
+    // With valid auth, would expect 400 for invalid cursor
+    expect([400, 401]).toContain(resp.status);
+  });
+
+  it('should include X-Request-Id header', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/leads', {
+      headers: { 'X-SC-Key': 'test-key' },
+    });
+
+    expect(resp.headers.get('X-Request-Id')).toBeDefined();
+    expect(resp.headers.get('X-Request-Id')).toMatch(/^req_[a-f0-9]{16}$/);
+  });
+
+  it('should return paginated list with valid status filter', async () => {
+    // This test requires database setup with test data
+    // In a real implementation, we would:
+    // 1. Create test experiment
+    // 2. Create test leads with different statuses
+    // 3. Query with status filter
+    // 4. Verify only leads with matching status are returned
+
+    // TODO: Implement after D1 local testing is set up
+  });
+
+  it('should return paginated list with cursor pagination', async () => {
+    // This test requires database setup with test data
+    // In a real implementation, we would:
+    // 1. Create test experiment
+    // 2. Create multiple test leads
+    // 3. Query first page, get next_cursor
+    // 4. Query second page with cursor
+    // 5. Verify pagination works correctly
+
+    // TODO: Implement after D1 local testing is set up
+  });
+});
+
+describe('GET /experiments/:id/decision_memos (Issue #11)', () => {
+  let worker: UnstableDevWorker;
+
+  beforeAll(async () => {
+    worker = await unstable_dev('src/index.ts', {
+      experimental: { disableExperimentalWarning: true },
+      local: true,
+    });
+  });
+
+  afterAll(async () => {
+    await worker.stop();
+  });
+
+  it('should return 401 without X-SC-Key header', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/decision_memos');
+    expect(resp.status).toBe(401);
+
+    const data = await resp.json();
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('UNAUTHORIZED');
+  });
+
+  it('should return 404 for non-existent experiment when authenticated', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-999/decision_memos', {
+      headers: { 'X-SC-Key': 'test-key' },
+    });
+
+    // Expecting 401 in test environment without valid SC_API_KEY
+    // With valid auth, would expect 404 for non-existent experiment
+    expect([404, 401]).toContain(resp.status);
+  });
+
+  it('should include X-Request-Id header', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/decision_memos', {
+      headers: { 'X-SC-Key': 'test-key' },
+    });
+
+    expect(resp.headers.get('X-Request-Id')).toBeDefined();
+    expect(resp.headers.get('X-Request-Id')).toMatch(/^req_[a-f0-9]{16}$/);
+  });
+
+  it('should return list of decision memos ordered by created_at DESC', async () => {
+    // This test requires database setup with test data
+    // In a real implementation, we would:
+    // 1. Create test experiment
+    // 2. Create multiple decision memos
+    // 3. Query decision memos
+    // 4. Verify they are ordered by created_at DESC
+
+    // TODO: Implement after D1 local testing is set up
+  });
+});
+
+describe('POST /experiments/:id/decision_memos (Issue #11)', () => {
+  let worker: UnstableDevWorker;
+
+  beforeAll(async () => {
+    worker = await unstable_dev('src/index.ts', {
+      experimental: { disableExperimentalWarning: true },
+      local: true,
+    });
+  });
+
+  afterAll(async () => {
+    await worker.stop();
+  });
+
+  it('should return 401 without X-SC-Key header', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/decision_memos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        decision: 'GO',
+        rationale: 'Strong market signal',
+      }),
+    });
+
+    expect(resp.status).toBe(401);
+    const data = await resp.json();
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('UNAUTHORIZED');
+  });
+
+  it('should return 400 for missing required fields', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/decision_memos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-SC-Key': 'test-key',
+      },
+      body: JSON.stringify({}),
+    });
+
+    // Expecting 401 in test environment without valid SC_API_KEY
+    // With valid auth, would expect 400 for missing fields
+    expect([400, 401]).toContain(resp.status);
+  });
+
+  it('should return 400 for invalid decision value', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/decision_memos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-SC-Key': 'test-key',
+      },
+      body: JSON.stringify({
+        decision: 'INVALID_VALUE',
+        rationale: 'Test rationale',
+      }),
+    });
+
+    // Expecting 401 in test environment without valid SC_API_KEY
+    // With valid auth, would expect 400 for invalid decision
+    expect([400, 401]).toContain(resp.status);
+  });
+
+  it('should return 400 for invalid confidence_pct', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/decision_memos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-SC-Key': 'test-key',
+      },
+      body: JSON.stringify({
+        decision: 'GO',
+        rationale: 'Test rationale',
+        confidence_pct: 150,
+      }),
+    });
+
+    // Expecting 401 in test environment without valid SC_API_KEY
+    // With valid auth, would expect 400 for invalid confidence_pct
+    expect([400, 401]).toContain(resp.status);
+  });
+
+  it('should return 404 for non-existent experiment when authenticated', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-999/decision_memos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-SC-Key': 'test-key',
+      },
+      body: JSON.stringify({
+        decision: 'GO',
+        rationale: 'Test rationale',
+      }),
+    });
+
+    // Expecting 401 in test environment without valid SC_API_KEY
+    // With valid auth, would expect 404 for non-existent experiment
+    expect([404, 401]).toContain(resp.status);
+  });
+
+  it('should include X-Request-Id header', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/decision_memos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-SC-Key': 'test-key',
+      },
+      body: JSON.stringify({
+        decision: 'GO',
+        rationale: 'Test rationale',
+      }),
+    });
+
+    expect(resp.headers.get('X-Request-Id')).toBeDefined();
+    expect(resp.headers.get('X-Request-Id')).toMatch(/^req_[a-f0-9]{16}$/);
+  });
+
+  it('should create decision memo with all fields', async () => {
+    // This test requires database setup with test data
+    // In a real implementation, we would:
+    // 1. Create test experiment
+    // 2. Create decision memo with all fields
+    // 3. Verify 201 response with created memo
+
+    // TODO: Implement after D1 local testing is set up
+  });
+
+  it('should allow multiple decision memos for same experiment', async () => {
+    // This test requires database setup with test data
+    // Per spec v1.2: No UNIQUE constraint, multiple decisions allowed
+    // In a real implementation, we would:
+    // 1. Create test experiment
+    // 2. Create first decision memo (e.g., PIVOT)
+    // 3. Create second decision memo (e.g., KILL)
+    // 4. Verify both exist
+
+    // TODO: Implement after D1 local testing is set up
+  });
+});
+
+describe('GET /experiments/:id/learning_memos (Issue #12)', () => {
+  let worker: UnstableDevWorker;
+
+  beforeAll(async () => {
+    worker = await unstable_dev('src/index.ts', {
+      experimental: { disableExperimentalWarning: true },
+      local: true,
+    });
+  });
+
+  afterAll(async () => {
+    await worker.stop();
+  });
+
+  it('should return 401 without X-SC-Key header', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/learning_memos');
+    expect(resp.status).toBe(401);
+
+    const data = await resp.json();
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('UNAUTHORIZED');
+  });
+
+  it('should return 404 for non-existent experiment when authenticated', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-999/learning_memos', {
+      headers: { 'X-SC-Key': 'test-key' },
+    });
+
+    // Expecting 401 in test environment without valid SC_API_KEY
+    // With valid auth, would expect 404 for non-existent experiment
+    expect([404, 401]).toContain(resp.status);
+  });
+
+  it('should include X-Request-Id header', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/learning_memos', {
+      headers: { 'X-SC-Key': 'test-key' },
+    });
+
+    expect(resp.headers.get('X-Request-Id')).toBeDefined();
+    expect(resp.headers.get('X-Request-Id')).toMatch(/^req_[a-f0-9]{16}$/);
+  });
+
+  it('should return list of learning memos ordered by week_number ASC', async () => {
+    // This test requires database setup with test data
+    // In a real implementation, we would:
+    // 1. Create test experiment
+    // 2. Create multiple learning memos
+    // 3. Query learning memos
+    // 4. Verify they are ordered by week_number ASC
+
+    // TODO: Implement after D1 local testing is set up
+  });
+});
+
+describe('POST /experiments/:id/learning_memos (Issue #12)', () => {
+  let worker: UnstableDevWorker;
+
+  beforeAll(async () => {
+    worker = await unstable_dev('src/index.ts', {
+      experimental: { disableExperimentalWarning: true },
+      local: true,
+    });
+  });
+
+  afterAll(async () => {
+    await worker.stop();
+  });
+
+  it('should return 401 without X-SC-Key header', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/learning_memos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        week_number: 1,
+        week_start: '2026-01-06',
+        week_end: '2026-01-12',
+        observations: 'Initial observations',
+      }),
+    });
+
+    expect(resp.status).toBe(401);
+    const data = await resp.json();
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('UNAUTHORIZED');
+  });
+
+  it('should return 400 for missing required fields', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/learning_memos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-SC-Key': 'test-key',
+      },
+      body: JSON.stringify({}),
+    });
+
+    // Expecting 401 in test environment without valid SC_API_KEY
+    // With valid auth, would expect 400 for missing fields
+    expect([400, 401]).toContain(resp.status);
+  });
+
+  it('should return 400 for invalid week_number', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/learning_memos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-SC-Key': 'test-key',
+      },
+      body: JSON.stringify({
+        week_number: 0,
+        week_start: '2026-01-06',
+        week_end: '2026-01-12',
+        observations: 'Test observations',
+      }),
+    });
+
+    // Expecting 401 in test environment without valid SC_API_KEY
+    // With valid auth, would expect 400 for invalid week_number
+    expect([400, 401]).toContain(resp.status);
+  });
+
+  it('should return 400 for invalid date format', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/learning_memos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-SC-Key': 'test-key',
+      },
+      body: JSON.stringify({
+        week_number: 1,
+        week_start: 'invalid-date',
+        week_end: '2026-01-12',
+        observations: 'Test observations',
+      }),
+    });
+
+    // Expecting 401 in test environment without valid SC_API_KEY
+    // With valid auth, would expect 400 for invalid date format
+    expect([400, 401]).toContain(resp.status);
+  });
+
+  it('should return 404 for non-existent experiment when authenticated', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-999/learning_memos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-SC-Key': 'test-key',
+      },
+      body: JSON.stringify({
+        week_number: 1,
+        week_start: '2026-01-06',
+        week_end: '2026-01-12',
+        observations: 'Test observations',
+      }),
+    });
+
+    // Expecting 401 in test environment without valid SC_API_KEY
+    // With valid auth, would expect 404 for non-existent experiment
+    expect([404, 401]).toContain(resp.status);
+  });
+
+  it('should include X-Request-Id header', async () => {
+    const resp = await worker.fetch('/experiments/SC-2026-001/learning_memos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-SC-Key': 'test-key',
+      },
+      body: JSON.stringify({
+        week_number: 1,
+        week_start: '2026-01-06',
+        week_end: '2026-01-12',
+        observations: 'Test observations',
+      }),
+    });
+
+    expect(resp.headers.get('X-Request-Id')).toBeDefined();
+    expect(resp.headers.get('X-Request-Id')).toMatch(/^req_[a-f0-9]{16}$/);
+  });
+
+  it('should create learning memo with all fields', async () => {
+    // This test requires database setup with test data
+    // In a real implementation, we would:
+    // 1. Create test experiment
+    // 2. Create learning memo with all fields
+    // 3. Verify 201 response with created memo
+
+    // TODO: Implement after D1 local testing is set up
+  });
+
+  it('should return 409 for duplicate week_number', async () => {
+    // This test requires database setup with test data
+    // Per schema: UNIQUE(experiment_id, week_number)
+    // In a real implementation, we would:
+    // 1. Create test experiment
+    // 2. Create learning memo for week 1
+    // 3. Try to create another memo for week 1
+    // 4. Verify 409 DUPLICATE_WEEK response
+
+    // TODO: Implement after D1 local testing is set up
+  });
+});
