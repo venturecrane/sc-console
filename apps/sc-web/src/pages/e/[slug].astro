@@ -157,7 +157,7 @@ const priceDisplay = hasPricing ? `$${(experiment.price_cents! / 100).toFixed(2)
     </div>
   </main>
 
-  <script define:vars={{ experimentId: experiment.id, slug, apiUrl: import.meta.env.PUBLIC_API_URL }}>
+  <script define:vars={{ experimentId: experiment.id, slug, apiUrl: 'https://sc-api.automation-ab6.workers.dev' }}>
     // Generate session and visitor IDs
     function getOrCreateId(key, expiryDays) {
       let id = localStorage.getItem(key);
