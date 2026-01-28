@@ -1,6 +1,6 @@
 name = "sc-api"
 main = "src/index.ts"
-compatibility_date = "2024-01-15"
+compatibility_date = "2024-09-23"
 
 [vars]
 ENVIRONMENT = "production"
@@ -15,6 +15,9 @@ database_id = "29424de8-2f7c-400f-bd23-03f8d2f390bc"
 [[r2_buckets]]
 binding = "ASSETS"
 bucket_name = "sc-assets"
+
+# Email notifications via Resend (set RESEND_API_KEY via wrangler secret put)
+# Sign up at https://resend.com and add siliconcrane.com domain
 
 [env.preview]
 vars = { ENVIRONMENT = "preview", CORS_ORIGIN = "*", API_VERSION = "1.2.0" }

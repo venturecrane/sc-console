@@ -16,6 +16,7 @@ interface Env {
   GA4_MEASUREMENT_ID?: string;
   KIT_API_KEY?: string;
   TURNSTILE_SECRET_KEY?: string;
+  RESEND_API_KEY?: string;
 }
 
 // Error response format (Section 4.4)
@@ -179,6 +180,118 @@ app.get('/health', (c) => {
     version: c.env.API_VERSION,
     environment: c.env.ENVIRONMENT,
   });
+});
+
+// POST /contact - Public contact form endpoint
+app.post('/contact', async (c) => {
+  const requestId = c.get('requestId');
+
+  try {
+    const body = await c.req.json();
+
+    const { name, email, company, message, source, website } = body;
+
+    // Honeypot check - if website field is filled, it's likely a bot
+    if (website) {
+      // Silently accept but don't store
+      return c.json({ success: true, data: { message: 'Thank you for your message' } });
+    }
+
+    // Validate required fields
+    if (!name || !email || !message) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'INVALID_REQUEST',
+          message: 'Missing required fields: name, email, and message are required',
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 400);
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      const errorResponse: ErrorResponse = {
+        success: false,
+        error: {
+          code: 'INVALID_EMAIL',
+          message: 'Invalid email format',
+          request_id: requestId,
+        },
+      };
+      return c.json(errorResponse, 400);
+    }
+
+    // Insert submission
+    const result = await c.env.DB.prepare(
+      `INSERT INTO contact_submissions (name, email, company, message, source) VALUES (?, ?, ?, ?, ?)`
+    )
+      .bind(
+        name.trim(),
+        email.toLowerCase().trim(),
+        company?.trim() || null,
+        message.trim(),
+        source || 'unknown'
+      )
+      .run();
+
+    // Send email notification via Resend
+    if (c.env.RESEND_API_KEY) {
+      try {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${c.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: 'Silicon Crane <noreply@siliconcrane.com>',
+            to: ['launch@siliconcrane.com'],
+            subject: `New Contact: ${name.trim()} - ${company?.trim() || 'No company'}`,
+            text: `New contact form submission from ${source || 'siliconcrane.com'}
+
+Name: ${name.trim()}
+Email: ${email.toLowerCase().trim()}
+Company: ${company?.trim() || 'Not provided'}
+
+Message:
+${message.trim()}
+
+---
+Submission ID: ${result.meta.last_row_id}
+Timestamp: ${new Date().toISOString()}
+`,
+          }),
+        });
+      } catch (emailError) {
+        // Log but don't fail the request if email fails
+        console.error('Failed to send email notification:', emailError);
+      }
+    }
+
+    const successResponse: SuccessResponse<{ id: number; message: string }> = {
+      success: true,
+      data: {
+        id: result.meta.last_row_id as number,
+        message: 'Thank you for your message. We will be in touch soon.',
+      },
+    };
+
+    return c.json(successResponse, 201);
+  } catch (error) {
+    console.error('Contact submission error:', error);
+    const errorResponse: ErrorResponse = {
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to submit contact form',
+        request_id: requestId,
+      },
+    };
+    return c.json(errorResponse, 500);
+  }
 });
 
 // POST /leads (Section 4.8.2, Issue #5)

@@ -4,16 +4,282 @@ import Base from '../layouts/Base.astro';
 export const prerender = true;
 ---
 
-<Base title="Silicon Crane" description="Expert B2B software sprint execution">
-  <main class="container mx-auto px-4 py-16">
-    <div class="max-w-4xl mx-auto text-center">
-      <h1 class="text-5xl font-bold mb-6">Silicon Crane</h1>
-      <p class="text-xl text-gray-600 mb-8">
-        Expert B2B software sprint execution
-      </p>
-      <p class="text-gray-500">
-        Homepage placeholder - content coming soon
-      </p>
+<Base title="Silicon Crane | Expert B2B Software Sprint Execution" description="Ship validated software in 30 days. We transform your hypothesis into working code, landing pages, and market evidence.">
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+    <div class="container mx-auto px-4 py-20 md:py-32">
+      <div class="max-w-4xl mx-auto text-center">
+        <p class="text-blue-400 font-medium mb-4 tracking-wide uppercase text-sm">Expert B2B Software Sprint Execution</p>
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          From Hypothesis to<br class="hidden md:block" /> Working Software in 30 Days
+        </h1>
+        <p class="text-xl md:text-2xl text-slate-300 mb-10 max-w-2xl mx-auto">
+          Stop spending months on code that might not matter. We build the MVPs, landing pages, and technical experiments you need to validate fast.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#contact" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
+            Start Your Sprint
+          </a>
+          <a href="#how-it-works" class="border border-slate-500 hover:border-slate-400 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
+            How It Works
+          </a>
+        </div>
+      </div>
     </div>
-  </main>
+  </section>
+
+  <!-- Problem Section -->
+  <section class="bg-white py-20">
+    <div class="container mx-auto px-4">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+          The average startup spends $250K and 18 months before realizing they built the wrong thing.
+        </h2>
+        <p class="text-xl text-slate-600">
+          You don't need a bigger team or more runway. You need evidence before you invest. We build the technical proof points that turn assumptions into answers.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="how-it-works" class="bg-slate-50 py-20">
+    <div class="container mx-auto px-4">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">What We Build</h2>
+          <p class="text-xl text-slate-600">Focused sprints that deliver evidence, not just code</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Service 1 -->
+          <div class="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-3">Landing Pages</h3>
+            <p class="text-slate-600">
+              High-converting pages that capture leads and measure real demand. Launch in days, not weeks.
+            </p>
+          </div>
+
+          <!-- Service 2 -->
+          <div class="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-3">MVPs & Prototypes</h3>
+            <p class="text-slate-600">
+              Functional software that tests your core hypothesis. Enough to learn, lean enough to pivot.
+            </p>
+          </div>
+
+          <!-- Service 3 -->
+          <div class="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-3">Validation Infrastructure</h3>
+            <p class="text-slate-600">
+              Analytics, payment flows, and lead capture systems that generate the metrics you need to decide.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Section -->
+  <section class="bg-white py-20">
+    <div class="container mx-auto px-4">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Why Silicon Crane</h2>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-12">
+          <div class="text-center">
+            <div class="text-4xl font-bold text-blue-600 mb-2">30</div>
+            <div class="text-lg font-semibold text-slate-900 mb-2">Days to Delivery</div>
+            <p class="text-slate-600">Fixed sprints with clear deliverables. No scope creep, no surprises.</p>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl font-bold text-blue-600 mb-2">100%</div>
+            <div class="text-lg font-semibold text-slate-900 mb-2">Evidence-Focused</div>
+            <p class="text-slate-600">Every line of code is designed to generate learning, not just features.</p>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl font-bold text-blue-600 mb-2">Go/Kill/Pivot</div>
+            <div class="text-lg font-semibold text-slate-900 mb-2">Clear Decisions</div>
+            <p class="text-slate-600">We help you define success upfront so results speak for themselves.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section id="contact" class="bg-slate-900 py-20">
+    <div class="container mx-auto px-4">
+      <div class="max-w-2xl mx-auto">
+        <div class="text-center mb-10">
+          <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+            Ready to validate faster?
+          </h2>
+          <p class="text-xl text-slate-300">
+            Tell us about your hypothesis. We'll scope a sprint that gets you to a decision.
+          </p>
+        </div>
+
+        <div id="contact-form-message" class="hidden mb-6 p-4 rounded-lg text-center"></div>
+
+        <form id="contact-form" class="space-y-6">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <label for="contact-name" class="block text-sm font-medium text-slate-300 mb-2">Name *</label>
+              <input
+                type="text"
+                id="contact-name"
+                name="name"
+                required
+                class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Your name"
+              />
+            </div>
+            <div>
+              <label for="contact-email" class="block text-sm font-medium text-slate-300 mb-2">Email *</label>
+              <input
+                type="email"
+                id="contact-email"
+                name="email"
+                required
+                class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="you@company.com"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="contact-company" class="block text-sm font-medium text-slate-300 mb-2">Company</label>
+            <input
+              type="text"
+              id="contact-company"
+              name="company"
+              class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Your company"
+            />
+          </div>
+
+          <div>
+            <label for="contact-message" class="block text-sm font-medium text-slate-300 mb-2">What are you looking to validate? *</label>
+            <textarea
+              id="contact-message"
+              name="message"
+              required
+              rows="4"
+              class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              placeholder="Tell us about your idea or hypothesis..."
+            ></textarea>
+          </div>
+
+          <!-- Honeypot -->
+          <div style="position: absolute; left: -9999px;" aria-hidden="true">
+            <input type="text" id="contact-website" name="website" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <button
+            type="submit"
+            id="contact-submit"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg disabled:bg-slate-600 disabled:cursor-not-allowed"
+          >
+            Get in Touch
+          </button>
+        </form>
+
+        <p class="text-slate-500 mt-8 text-sm text-center">
+          Or email us directly at <a href="mailto:launch@siliconcrane.com" class="text-blue-400 hover:text-blue-300">launch@siliconcrane.com</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const form = document.getElementById('contact-form');
+    const submitBtn = document.getElementById('contact-submit');
+    const messageDiv = document.getElementById('contact-form-message');
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Check honeypot
+      const honeypot = document.getElementById('contact-website') as HTMLInputElement;
+      if (honeypot?.value) {
+        messageDiv.className = 'mb-6 p-4 rounded-lg text-center bg-green-900/50 text-green-300 border border-green-700';
+        messageDiv.textContent = "Thanks! We'll be in touch soon.";
+        messageDiv.classList.remove('hidden');
+        form.reset();
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+
+      const formData = new FormData(form);
+      const data = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        company: formData.get('company') || '',
+        message: formData.get('message'),
+        source: 'siliconcrane.com'
+      };
+
+      try {
+        const response = await fetch('https://sc-api.automation-ab6.workers.dev/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          messageDiv.className = 'mb-6 p-4 rounded-lg text-center bg-green-900/50 text-green-300 border border-green-700';
+          messageDiv.textContent = "Thanks! We'll be in touch soon.";
+          messageDiv.classList.remove('hidden');
+          form.reset();
+        } else {
+          throw new Error('Failed to submit');
+        }
+      } catch (error) {
+        // Fallback: open email client with prefilled content
+        const subject = encodeURIComponent('Sprint Inquiry from ' + data.name);
+        const body = encodeURIComponent(
+          `Name: ${data.name}\nEmail: ${data.email}\nCompany: ${data.company}\n\nMessage:\n${data.message}`
+        );
+        window.location.href = `mailto:launch@siliconcrane.com?subject=${subject}&body=${body}`;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Get in Touch';
+      }
+    });
+  </script>
+
+  <!-- Footer -->
+  <footer class="bg-slate-950 py-12">
+    <div class="container mx-auto px-4">
+      <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center">
+        <div class="text-slate-400 mb-4 md:mb-0">
+          &copy; 2026 Silicon Crane. All rights reserved.
+        </div>
+        <div class="flex gap-6 text-slate-400">
+          <a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
+          <a href="https://venturecrane.com" class="hover:text-white transition-colors" target="_blank" rel="noopener">Venture Crane</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 </Base>
