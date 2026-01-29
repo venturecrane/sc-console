@@ -462,7 +462,7 @@ What happens next:
 - You'll be among the first to know when we launch
 - We may reach out for feedback along the way
 
-If you have any questions, just reply to this email.
+If you have any questions, reach out to us at launch@siliconcrane.com.
 
 Thanks for your interest!
 
