@@ -1,0 +1,74 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getExperimentBySlug } from '../../../lib/api';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/');
+}
+
+const experiment = await getExperimentBySlug(slug);
+const experimentName = experiment?.name || 'Silicon Crane';
+---
+
+<Base title={`Thank You | ${experimentName}`} description="Thanks for joining!">
+  <main class="container mx-auto px-4 py-16">
+    <div class="max-w-2xl mx-auto text-center">
+      <!-- Success Icon -->
+      <div class="mb-8">
+        <div class="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+          <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Thank You Message -->
+      <h1 class="text-4xl font-bold mb-4">Thank You!</h1>
+      <p class="text-xl text-gray-600 mb-8">
+        You're all set. We'll be in touch soon with updates about {experimentName}.
+      </p>
+
+      <!-- What's Next -->
+      <div class="bg-gray-50 rounded-lg p-6 mb-8 text-left">
+        <h2 class="text-lg font-semibold mb-3">What happens next?</h2>
+        <ul class="space-y-2 text-gray-700">
+          <li class="flex items-start">
+            <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <circle cx="10" cy="10" r="10"/>
+            </svg>
+            <span>Check your email for a confirmation (it should arrive within a few minutes)</span>
+          </li>
+          <li class="flex items-start">
+            <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <circle cx="10" cy="10" r="10"/>
+            </svg>
+            <span>We'll keep you updated on our progress</span>
+          </li>
+          <li class="flex items-start">
+            <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <circle cx="10" cy="10" r="10"/>
+            </svg>
+            <span>You'll be among the first to know when we launch</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Back to Homepage -->
+      <div>
+        <a
+          href="/"
+          class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Back to homepage
+        </a>
+      </div>
+    </div>
+  </main>
+</Base>

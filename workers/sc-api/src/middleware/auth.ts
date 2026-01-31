@@ -4,6 +4,7 @@ import { Context, Next } from 'hono';
 const PUBLIC_ROUTES = [
   { method: 'POST', path: '/leads' },
   { method: 'POST', path: '/events' },
+  { method: 'POST', path: '/contact' }, // Public contact form
   { method: 'GET', pathPattern: /^\/experiments\/by-slug\/[^/]+$/ },
   { method: 'POST', path: '/payments/webhook' }, // Uses Stripe signature
   { method: 'GET', path: '/health' },

@@ -1,0 +1,120 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getExperimentBySlug } from '../../../lib/api';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/404');
+}
+
+const experiment = await getExperimentBySlug(slug);
+
+// Redirect if experiment not found or not active
+if (!experiment || !['launch', 'run'].includes(experiment.status)) {
+  return Astro.redirect('/404');
+}
+
+// Redirect if experiment doesn't have a price configured
+if (!experiment.stripe_price_id) {
+  return Astro.redirect(`/e/${slug}`);
+}
+
+const STRIPE_PUBLISHABLE_KEY = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY;
+---
+
+<Base title={`Payment | ${experiment.name}`} description="Complete your payment">
+  <main class="container mx-auto px-4 py-16">
+    <div class="max-w-2xl mx-auto">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold mb-4">Complete Your Payment</h1>
+        <p class="text-gray-600">
+          You'll be redirected to Stripe to complete your secure payment for <strong>{experiment.name}</strong>.
+        </p>
+      </div>
+
+      <div class="bg-gray-50 rounded-lg p-8 text-center">
+        <div id="loading" class="mb-4">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p class="mt-4 text-gray-600">Preparing checkout...</p>
+        </div>
+
+        <div id="error" class="hidden">
+          <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-4">
+            <p id="error-message">Something went wrong. Please try again.</p>
+          </div>
+          <a
+            href={`/e/${slug}`}
+            class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+          >
+            Go Back
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script is:inline src="https://js.stripe.com/v3/"></script>
+  <script
+    define:vars={{
+      stripePriceId: experiment.stripe_price_id,
+      stripePublishableKey: STRIPE_PUBLISHABLE_KEY,
+      slug,
+    }}
+  >
+    // Wait for Stripe.js to load
+    const initializePayment = async () => {
+      if (!window.Stripe) {
+        console.error('Stripe.js failed to load');
+        showError('Payment system unavailable. Please try again later.');
+        return;
+      }
+
+      // Get customer email from URL query params if available
+      const urlParams = new URLSearchParams(window.location.search);
+      const customerEmail = urlParams.get('email');
+
+      const stripe = window.Stripe(stripePublishableKey);
+
+      try {
+        // Redirect to Stripe Checkout
+        const { error } = await stripe.redirectToCheckout({
+          lineItems: [
+            {
+              price: stripePriceId,
+              quantity: 1,
+            },
+          ],
+          mode: 'payment',
+          successUrl: `${window.location.origin}/e/${slug}/thank-you?payment=success`,
+          cancelUrl: `${window.location.origin}/e/${slug}?payment=cancelled`,
+          customerEmail: customerEmail || undefined,
+          clientReferenceId: slug,
+        });
+
+        if (error) {
+          console.error('Stripe checkout error:', error);
+          showError(error.message || 'Failed to redirect to checkout');
+        }
+      } catch (err) {
+        console.error('Payment initialization error:', err);
+        showError('Failed to initialize payment. Please try again.');
+      }
+    };
+
+    function showError(message) {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('error').classList.remove('hidden');
+      document.getElementById('error-message').textContent = message;
+    }
+
+    // Initialize payment when page loads
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializePayment);
+    } else {
+      initializePayment();
+    }
+  </script>
+</Base>
