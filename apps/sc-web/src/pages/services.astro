@@ -26,8 +26,43 @@ export const prerender = true;
     </div>
   </section>
 
+  <!-- Pricing Section -->
+  <section class="py-16 bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto text-center">
+        <span class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold bg-crane-100 text-crane-800">
+          Founding Client Rate
+        </span>
+        <div class="mt-6">
+          <span class="text-5xl md:text-6xl font-bold text-gray-900">$2,500</span>
+          <span class="text-xl text-gray-500 ml-2">flat rate</span>
+        </div>
+        <p class="mt-4 text-lg text-gray-600">
+          All sprint types, one simple price. No hourly billing, no surprises.
+        </p>
+        <p class="mt-2 text-sm text-gray-500">
+          Founding client pricing is available for a limited time as we build our case study portfolio.
+        </p>
+        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="#contact"
+            class="inline-flex items-center justify-center px-6 py-3 bg-crane-600 text-white rounded-lg hover:bg-crane-700 transition-colors font-semibold"
+          >
+            Start Your Sprint
+          </a>
+          <a
+            href="#experiment-types"
+            class="inline-flex items-center justify-center px-6 py-3 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-semibold border border-gray-200"
+          >
+            View Sprint Types
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Experiment Types -->
-  <section class="py-20 bg-white">
+  <section id="experiment-types" class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid gap-12">
         <!-- Waitlist Experiment -->
@@ -70,7 +105,11 @@ export const prerender = true;
             <div class="text-center">
               <div class="text-4xl font-bold text-crane-600">2 weeks</div>
               <div class="mt-2 text-gray-600">Average sprint duration</div>
-              <div class="mt-6 text-sm text-gray-500">
+              <div class="mt-4 py-2 px-4 bg-crane-100 rounded-lg inline-block">
+                <span class="text-lg font-bold text-crane-700">$2,500</span>
+                <span class="text-sm text-crane-600"> flat</span>
+              </div>
+              <div class="mt-4 text-sm text-gray-500">
                 Success signal: &gt;5% conversion rate from ad to signup
               </div>
             </div>
@@ -119,7 +158,11 @@ export const prerender = true;
             <div class="text-center">
               <div class="text-4xl font-bold text-crane-600">3 weeks</div>
               <div class="mt-2 text-gray-600">Average sprint duration</div>
-              <div class="mt-6 text-sm text-gray-500">
+              <div class="mt-4 py-2 px-4 bg-crane-100 rounded-lg inline-block">
+                <span class="text-lg font-bold text-crane-700">$2,500</span>
+                <span class="text-sm text-crane-600"> flat</span>
+              </div>
+              <div class="mt-4 text-sm text-gray-500">
                 Success signal: &gt;2% conversion from visitor to paid deposit
               </div>
             </div>
@@ -168,7 +211,11 @@ export const prerender = true;
             <div class="text-center">
               <div class="text-4xl font-bold text-crane-600">4 weeks</div>
               <div class="mt-2 text-gray-600">Average sprint duration</div>
-              <div class="mt-6 text-sm text-gray-500">
+              <div class="mt-4 py-2 px-4 bg-crane-100 rounded-lg inline-block">
+                <span class="text-lg font-bold text-crane-700">$2,500</span>
+                <span class="text-sm text-crane-600"> flat</span>
+              </div>
+              <div class="mt-4 text-sm text-gray-500">
                 Success signal: Revenue covers minimum viable build cost
               </div>
             </div>
@@ -217,7 +264,11 @@ export const prerender = true;
             <div class="text-center">
               <div class="text-4xl font-bold text-crane-600">4-6 weeks</div>
               <div class="mt-2 text-gray-600">Average sprint duration</div>
-              <div class="mt-6 text-sm text-gray-500">
+              <div class="mt-4 py-2 px-4 bg-crane-100 rounded-lg inline-block">
+                <span class="text-lg font-bold text-crane-700">$2,500</span>
+                <span class="text-sm text-crane-600"> flat</span>
+              </div>
+              <div class="mt-4 text-sm text-gray-500">
                 Success signal: Repeat usage and referrals
               </div>
             </div>
@@ -298,23 +349,26 @@ export const prerender = true;
   </section>
 
   <!-- CTA Section -->
-  <section class="py-20 bg-crane-600">
+  <section id="contact" class="py-20 bg-crane-600">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="max-w-3xl mx-auto text-center">
         <h2 class="text-3xl md:text-4xl font-bold text-white">
-          Which experiment is right for your idea?
+          Ready to validate your idea?
         </h2>
         <p class="mt-6 text-xl text-crane-100">
-          Let us help you choose the validation approach that will give you the clearest signal.
+          Get started with a founding client sprint at $2,500 flat rate.
         </p>
-        <div class="mt-10">
+        <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
           <a
-            href="mailto:hello@siliconcrane.com"
+            href="mailto:launch@siliconcrane.com?subject=Sprint%20Inquiry"
             class="inline-flex items-center justify-center px-8 py-4 bg-white text-crane-600 rounded-lg hover:bg-gray-100 transition-colors font-semibold text-lg shadow-lg"
           >
-            Schedule a Free Consultation
+            Email Us to Get Started
           </a>
         </div>
+        <p class="mt-6 text-crane-100">
+          Or reach us directly at <a href="mailto:launch@siliconcrane.com" class="text-white underline hover:no-underline">launch@siliconcrane.com</a>
+        </p>
       </div>
     </div>
   </section>
