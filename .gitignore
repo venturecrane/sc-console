@@ -27,6 +27,7 @@ Thumbs.db
 
 # Build outputs
 dist/
+.astro/
 .cache/
 .codex/
 .gemini/
