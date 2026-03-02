@@ -160,12 +160,12 @@ const priceDisplay = hasPricing ? `$${(experiment.price_cents! / 100).toFixed(2)
     </div>
   </main>
 
-  <script define:vars={{ experimentId: experiment.id, slug, apiUrl: 'https://sc-api.automation-ab6.workers.dev' }}>
+  <script is:inline define:vars={{ experimentId: experiment.id, slug, apiUrl: 'https://sc-api.automation-ab6.workers.dev' }}>
     // Generate session and visitor IDs
-    function getOrCreateId(key, expiryDays) {
+    function getOrCreateId(key) {
       let id = localStorage.getItem(key);
       if (!id) {
-        id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        id = `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
         localStorage.setItem(key, id);
       }
       return id;
