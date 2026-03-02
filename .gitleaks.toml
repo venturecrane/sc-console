@@ -1,0 +1,10 @@
+[allowlist]
+paths = [
+  "node_modules",
+  "package-lock.json"
+]
+
+# Legacy hardcoded RELAY_KEY values - these files should be migrated to use environment variables
+regexes = [
+  "056b6f9859f5f315c704e9cebfd1bc88f3e1c0a74b904460a2de96ec9bceac2f"
+]
