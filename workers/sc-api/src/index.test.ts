@@ -630,7 +630,11 @@ describe('POST /payments/webhook (Issue #8)', () => {
       body: JSON.stringify({ type: 'payment_intent.succeeded' }),
     })
 
+<<<<<<< HEAD
     // Will return 500 if STRIPE_WEBHOOK_SECRET not configured, or 400 for invalid signature
+=======
+    // Will return 500 if STRIPE_WEBHOOK_SECRET not configured, or 400 for invalid signature format
+>>>>>>> c81e87e (chore: fix npm audit vulnerabilities)
     expect([400, 500]).toContain(resp.status)
     const data = await resp.json()
     expect(data.success).toBe(false)
@@ -646,7 +650,7 @@ describe('POST /payments/webhook (Issue #8)', () => {
       body: JSON.stringify({ type: 'payment_intent.succeeded' }),
     })
 
-    // Will return 500 if STRIPE_WEBHOOK_SECRET not configured, or 400 for invalid signature
+    // Will return 500 if STRIPE_WEBHOOK_SECRET not configured, or 400 for invalid signature format
     expect([400, 500]).toContain(resp.status)
   })
 
