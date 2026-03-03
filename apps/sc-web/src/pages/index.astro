@@ -210,12 +210,14 @@ export const prerender = true;
   </section>
 
   <script>
-    const form = document.getElementById('contact-form');
-    const submitBtn = document.getElementById('contact-submit');
-    const messageDiv = document.getElementById('contact-form-message');
+    const form = document.getElementById('contact-form') as HTMLFormElement | null;
+    const submitBtn = document.getElementById('contact-submit') as HTMLButtonElement | null;
+    const messageDiv = document.getElementById('contact-form-message') as HTMLDivElement | null;
 
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
+
+      if (!submitBtn || !messageDiv) return;
 
       // Check honeypot
       const honeypot = document.getElementById('contact-website') as HTMLInputElement;

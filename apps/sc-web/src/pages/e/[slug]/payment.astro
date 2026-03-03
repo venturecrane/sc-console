@@ -58,6 +58,7 @@ const STRIPE_PUBLISHABLE_KEY = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
   <script is:inline src="https://js.stripe.com/v3/"></script>
   <script
+    is:inline
     define:vars={{
       stripePriceId: experiment.stripe_price_id,
       stripePublishableKey: STRIPE_PUBLISHABLE_KEY,

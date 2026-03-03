@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { unstable_dev, UnstableDevWorker } from 'wrangler'
+import { unstable_dev, type Unstable_DevWorker } from 'wrangler'
 
 /**
  * Consolidated Tests for SC API
@@ -13,7 +13,7 @@ import { unstable_dev, UnstableDevWorker } from 'wrangler'
  */
 
 describe('Health check endpoint', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -37,7 +37,7 @@ describe('Health check endpoint', () => {
 })
 
 describe('POST /leads (Issue #5)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -145,7 +145,7 @@ describe('POST /leads (Issue #5)', () => {
 })
 
 describe('POST /events (Issue #6)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -278,7 +278,7 @@ describe('POST /events (Issue #6)', () => {
 })
 
 describe('GET /experiments (Issue #7)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -337,7 +337,7 @@ describe('GET /experiments (Issue #7)', () => {
 })
 
 describe('GET /experiments/by-slug/:slug (Issue #4)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -398,7 +398,7 @@ describe('GET /experiments/by-slug/:slug (Issue #4)', () => {
 })
 
 describe('GET /experiments/:id (Issue #7)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -435,7 +435,7 @@ describe('GET /experiments/:id (Issue #7)', () => {
 })
 
 describe('POST /experiments (Issue #7)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -517,7 +517,7 @@ describe('POST /experiments (Issue #7)', () => {
 })
 
 describe('PATCH /experiments/:id (Issue #7)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -591,7 +591,7 @@ describe('PATCH /experiments/:id (Issue #7)', () => {
 })
 
 describe('POST /payments/webhook (Issue #8)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -720,7 +720,7 @@ describe('POST /payments/webhook (Issue #8)', () => {
 })
 
 describe('GET /experiments/:id/leads (Issue #9)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -814,7 +814,7 @@ describe('GET /experiments/:id/leads (Issue #9)', () => {
 })
 
 describe('GET /experiments/:id/decision_memos (Issue #11)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -867,7 +867,7 @@ describe('GET /experiments/:id/decision_memos (Issue #11)', () => {
 })
 
 describe('POST /experiments/:id/decision_memos (Issue #11)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -1005,7 +1005,7 @@ describe('POST /experiments/:id/decision_memos (Issue #11)', () => {
 })
 
 describe('GET /experiments/:id/learning_memos (Issue #12)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -1058,7 +1058,7 @@ describe('GET /experiments/:id/learning_memos (Issue #12)', () => {
 })
 
 describe('POST /experiments/:id/learning_memos (Issue #12)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -1205,7 +1205,7 @@ describe('POST /experiments/:id/learning_memos (Issue #12)', () => {
 })
 
 describe('POST /metrics (Issue #10)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {
@@ -1351,7 +1351,7 @@ describe('POST /metrics (Issue #10)', () => {
 })
 
 describe('GET /metrics (Issue #10)', () => {
-  let worker: UnstableDevWorker
+  let worker: Unstable_DevWorker
 
   beforeAll(async () => {
     worker = await unstable_dev('src/index.ts', {

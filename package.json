@@ -2,14 +2,18 @@
   "name": "sc-console",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "apps/*",
+    "workers/*"
+  ],
   "scripts": {
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "typecheck": "echo 'Add typecheck commands for your workers here'",
-    "test": "echo 'Add test commands here'",
-    "verify": "npm run format:check && npm run lint",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "verify": "npm run typecheck && npm run format:check && npm run lint && npm run test",
     "prepare": "husky || true"
   },
   "devDependencies": {

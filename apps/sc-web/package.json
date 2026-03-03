@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "typecheck": "astro check"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
@@ -15,6 +16,8 @@
     "tailwindcss": "^3.4.19"
   },
   "devDependencies": {
-    "@vite-pwa/astro": "^1.2.0"
+    "@astrojs/check": "^0.9.0",
+    "@vite-pwa/astro": "^1.2.0",
+    "typescript": "^5.7.0"
   }
 }

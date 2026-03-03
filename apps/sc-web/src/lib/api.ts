@@ -19,6 +19,7 @@ export interface CopyPack {
   value_props?: string[]
   cta_primary?: string
   cta_secondary?: string
+  show_company?: boolean
 }
 
 export interface CreateLeadData {

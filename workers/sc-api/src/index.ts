@@ -2313,7 +2313,14 @@ app.get('/metrics', async (c) => {
     const metrics = result.results || []
 
     // Calculate totals
-    const totals = metrics.reduce(
+    const totals = metrics.reduce<{
+      impressions: number
+      clicks: number
+      sessions: number
+      conversions: number
+      spend_cents: number
+      revenue_cents: number
+    }>(
       (acc, m) => ({
         impressions: acc.impressions + ((m.impressions as number) || 0),
         clicks: acc.clicks + ((m.clicks as number) || 0),

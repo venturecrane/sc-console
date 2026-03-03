@@ -51,7 +51,7 @@ const GA4_ID = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
     <!-- Google Analytics -->
     {GA4_ID && (
       <>
-        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`}></script>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`}></script>
         <script is:inline define:vars={{ GA4_ID }}>
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
