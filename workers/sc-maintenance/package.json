@@ -5,11 +5,7 @@
   "scripts": {
     "dev": "wrangler dev --local",
     "deploy": "wrangler deploy",
-<<<<<<< HEAD
     "test": "vitest --passWithNoTests",
-=======
-    "test": "vitest --passWithNoTests",
->>>>>>> c81e87e (chore: fix npm audit vulnerabilities)
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

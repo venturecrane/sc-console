@@ -16,6 +16,12 @@
     "verify": "npm run typecheck && npm run format:check && npm run lint && npm run test",
     "prepare": "husky || true"
   },
+  "overrides": {
+    "lodash": "^4.17.23",
+    "serialize-javascript": "^7.0.4",
+    "undici": "^7.22.0",
+    "wrangler": "^4.69.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
     "eslint": "^9.18.0",
