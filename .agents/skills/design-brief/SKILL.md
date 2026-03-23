@@ -1,3 +1,8 @@
+---
+name: design-brief
+description: Multi-Agent Design Brief Generator
+---
+
 # /design-brief - Multi-Agent Design Brief Generator
 
 This command orchestrates a 4-agent design brief process with configurable rounds. It reads the PRD and existing design artifacts, runs structured design rounds with parallel agents, and synthesizes the output into a production-ready design brief.

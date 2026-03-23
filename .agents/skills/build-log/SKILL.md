@@ -1,3 +1,8 @@
+---
+name: build-log
+description: Draft a Build Log Entry
+---
+
 # /build-log - Draft a Build Log Entry
 
 Draft a short operational update (200-1,000 words) about what shipped, broke, or changed. The founder provides a topic and the agent drafts around it.

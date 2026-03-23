@@ -1,6 +1,9 @@
-description = "Start of Day"
+---
+name: sod
+description: Start of Day
+---
 
-prompt = """
+# /sod - Start of Day
 
 This command prepares your session using MCP tools to validate context, show work priorities, and ensure you're ready to code.
 
@@ -87,4 +90,3 @@ If MCP tools aren't available:
 1. Check `claude mcp list` shows crane connected
 2. Ensure started with: `crane vc`
 3. Try: `cd ~/dev/crane-console/packages/crane-mcp && npm run build && npm link`
-"""
