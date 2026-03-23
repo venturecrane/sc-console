@@ -1,3 +1,8 @@
+---
+name: eod
+description: End of Day Handoff
+---
+
 # /eod - End of Day Handoff
 
 Auto-generate handoff from session context. The agent summarizes - never ask the user.

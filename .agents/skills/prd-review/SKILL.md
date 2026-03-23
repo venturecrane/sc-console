@@ -1,3 +1,8 @@
+---
+name: prd-review
+description: Multi-Agent PRD Review
+---
+
 # /prd-review - Multi-Agent PRD Review
 
 This command orchestrates a 6-agent PRD review process with configurable rounds. It reads existing source documents, runs structured critique rounds with parallel agents, and synthesizes the output into a production-ready PRD.

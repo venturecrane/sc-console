@@ -4,101 +4,69 @@ This command prepares your session using MCP tools to validate context, show wor
 
 ## Execution
 
-### Step 1: Run Preflight Checks
-
-Call the `crane_preflight` MCP tool to validate environment:
-
-- CRANE_CONTEXT_KEY is set
-- gh CLI is authenticated
-- Git repository detected
-- API connectivity
-
-**If any critical check fails**, show the error and stop. The user needs to fix their environment.
-
-### Step 2: Start Session
+### Step 1: Start Session
 
 Call the `crane_sod` MCP tool to initialize the session.
 
-The tool returns:
+The tool returns a structured briefing with:
 
 - Session context (venture, repo, branch)
-- Last handoff summary
-- P0 issues (if any)
+- Behavioral directives (enterprise rules)
+- Continuity (recent handoffs)
+- Alerts (P0 issues, active sessions)
 - Weekly plan status
 - Cadence briefing (overdue/due recurring activities)
-- Active sessions (conflict detection)
-- Enterprise context (executive summaries)
+- Knowledge base and enterprise context
 
-> **Note:** Portfolio review status, code review staleness, and other recurring activity checks are now centralized in the Cadence section (powered by the schedule registry). No separate VCMS queries needed.
-
-> **Note:** The MCP tool reads the weekly plan but does not auto-create it. If the plan is missing, Step 5 below guides you through creating it.
-
-### Step 3: Display Context Confirmation
+### Step 2: Display Context Confirmation
 
 Present a clear context confirmation box:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  VENTURE:  {venture_name} ({venture_code})                  │
-│  REPO:     {repo}                                           │
-│  BRANCH:   {branch}                                         │
-│  SESSION:  {session_id}                                     │
-└─────────────────────────────────────────────────────────────┘
+VENTURE:  {venture_name} ({venture_code})
+REPO:     {repo}
+BRANCH:   {branch}
+SESSION:  {session_id}
 ```
 
 State: "You're in the correct repository and on the {branch} branch."
 
-### Step 4: Handle P0 Issues
+### Step 3: Handle P0 Issues
 
-If `p0_issues` is not empty:
+If the Alerts section shows P0 issues:
 
 1. Display prominently with warning icon
 2. Say: "**There are P0 issues that need immediate attention.**"
 3. List each issue
 
-If the P0 lookup failed (e.g., `gh` CLI error), warn: "**Could not check for P0 issues.** Verify `gh auth status` is valid." Continue with the rest of SOD - do not block.
+### Step 4: Check Work Plan
 
-### Step 5: Check Weekly Plan
+Query D1 for today's planned events:
 
-Based on `weekly_plan.status`:
+- Call `crane_schedule(action: "planned-events", from: "{today}", to: "{today}", type: "planned")`
+- **If found**: Display "Today: **{VENTURE} Work**, 6:30am - 10:30pm" in the context box
+- **If not found**: Suggest "No work plan for today. Run `/work-plan` to set up your schedule."
+
+Also check the weekly plan file status from the `crane_sod` response:
 
 - **valid**: Note the priority venture and proceed
-- **stale**: Warn user: "Weekly plan is {age_days} days old. Consider updating."
-- **missing**: Ask user:
-  - "What venture is priority this week? (vc/dfg/sc/ke)"
-  - "Any specific issues to target? (optional)"
-  - "Any capacity constraints? (optional)"
+- **stale**: Warn user: "Weekly plan is {age_days} days old. Consider running `/work-plan`."
+- **missing**: Suggest running `/work-plan`
 
-  Then create `docs/planning/WEEKLY_PLAN.md`:
+### Step 5: Cadence Decision Prompt
 
-  ```markdown
-  # Weekly Plan - Week of {DATE}
+The `crane_sod` response includes cadence status (overdue/due items).
 
-  ## Priority Venture
+For any overdue items:
 
-  {venture code}
+1. Display the overdue items list
+2. Ask: "**Want to execute any of these now, or skip?**"
+3. If user chooses to execute: run the appropriate command (e.g., `/portfolio-review`)
+4. If user skips: proceed to next step
 
-  ## Target Issues
+Do NOT create Google Calendar events for cadence items. Do NOT create Apple Reminders here (that is `/work-plan`'s job).
 
-  {list or "None specified"}
-
-  ## Capacity Notes
-
-  {notes or "Normal capacity"}
-
-  ## Created
-
-  {ISO timestamp}
-  ```
-
-### Step 6: Warn About Active Sessions
-
-If `active_sessions` is not empty:
-
-Display: "**Warning:** Other agents are active on this venture."
-List each session.
-
-### Step 7: STOP and Wait
+### Step 6: STOP and Wait
 
 **CRITICAL**: Do NOT automatically start working.
 

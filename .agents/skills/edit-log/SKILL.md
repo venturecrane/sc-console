@@ -1,3 +1,8 @@
+---
+name: edit-log
+description: Build Log Editorial Review
+---
+
 # /edit-log - Build Log Editorial Review
 
 Single-agent editorial review for build logs. Checks genericization and style, auto-fixes blocking issues, reports advisory issues for human judgment.

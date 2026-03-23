@@ -1,3 +1,8 @@
+---
+name: update
+description: Update Session Context
+---
+
 # /update - Update Session Context
 
 Update your session with current branch, commit, and work metadata.
