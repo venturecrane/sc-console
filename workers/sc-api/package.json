@@ -10,7 +10,8 @@
     "db:seed": "wrangler d1 execute sc-db --remote --file=migrations/seed.sql",
     "db:seed:local": "wrangler d1 execute sc-db --local --file=migrations/seed.sql",
     "db:reset:local": "wrangler d1 execute sc-db --local --file=migrations/0001_initial_schema.sql && wrangler d1 execute sc-db --local --file=migrations/seed.sql",
-    "test": "vitest --run",
+    "test": "vitest run --project unit-legacy --project harness",
+    "test:harness": "vitest run --project harness",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -18,6 +19,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240129.0",
+    "@venturecrane/crane-test-harness": "https://github.com/venturecrane/crane-console/releases/download/crane-test-harness-v0.1.0/venturecrane-crane-test-harness-0.1.0.tgz",
     "typescript": "^5.7.0",
     "vitest": "^4.0.18",
     "wrangler": "^4.69.0"
