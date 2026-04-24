@@ -5,6 +5,7 @@ const PUBLIC_ROUTES = [
   { method: 'POST', path: '/leads' },
   { method: 'POST', path: '/events' },
   { method: 'POST', path: '/contact' }, // Public contact form
+  { method: 'POST', path: '/waitlist' }, // Public waitlist (Turnstile-gated)
   { method: 'GET', pathPattern: /^\/experiments\/by-slug\/[^/]+$/ },
   { method: 'POST', path: '/payments/webhook' }, // Uses Stripe signature
   { method: 'GET', path: '/health' },

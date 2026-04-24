@@ -182,6 +182,232 @@ app.get('/health', (c) => {
   })
 })
 
+// POST /waitlist - Public waitlist signup (Turnstile-gated, Resend-backed)
+// Captain reviews pending rows in waitlist_signups, promotes to Clerk allowlist.
+app.post('/waitlist', async (c) => {
+  const requestId = c.get('requestId')
+
+  interface SignupBody {
+    email?: string
+    turnstileToken?: string
+    utm_source?: string
+    utm_medium?: string
+    utm_campaign?: string
+    utm_content?: string
+    referrer?: string
+    landing_path?: string
+  }
+
+  try {
+    const body = (await c.req.json().catch(() => ({}))) as SignupBody
+
+    const email = body.email?.trim().toLowerCase()
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!email || !EMAIL_RE.test(email) || email.length > 254) {
+      return c.json(
+        {
+          success: false,
+          error: { code: 'INVALID_EMAIL', message: 'Invalid email', request_id: requestId },
+        },
+        400
+      )
+    }
+
+    const turnstileToken = body.turnstileToken
+    if (!turnstileToken) {
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: 'MISSING_TURNSTILE',
+            message: 'Missing verification',
+            request_id: requestId,
+          },
+        },
+        400
+      )
+    }
+
+    const remoteIp = c.req.header('cf-connecting-ip') ?? undefined
+    const turnstileOk = await verifyTurnstileToken(
+      c.env.TURNSTILE_SECRET_KEY ?? '',
+      turnstileToken,
+      remoteIp
+    )
+    if (!turnstileOk) {
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: 'TURNSTILE_FAILED',
+            message: 'Verification failed',
+            request_id: requestId,
+          },
+        },
+        400
+      )
+    }
+
+    const id = crypto.randomUUID()
+    const unsubscribeToken = crypto.randomUUID()
+    const ipCountry = c.req.header('cf-ipcountry') ?? null
+    const userAgent = c.req.header('user-agent')?.slice(0, 500) ?? null
+
+    const result = await c.env.DB.prepare(
+      `INSERT INTO waitlist_signups
+        (id, email, unsubscribe_token, utm_source, utm_medium, utm_campaign,
+         utm_content, referrer, landing_path, ip_country, user_agent)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(email) DO NOTHING`
+    )
+      .bind(
+        id,
+        email,
+        unsubscribeToken,
+        body.utm_source ?? null,
+        body.utm_medium ?? null,
+        body.utm_campaign ?? null,
+        body.utm_content ?? null,
+        body.referrer ?? null,
+        body.landing_path ?? null,
+        ipCountry,
+        userAgent
+      )
+      .run()
+
+    const isNewSignup = (result.meta?.changes ?? 0) > 0
+
+    console.log(
+      JSON.stringify({
+        level: 'info',
+        event: 'waitlist_signup',
+        venture: 'sc',
+        request_id: requestId,
+        email_hash: await sha256Hex(email).then((h) => h.slice(0, 16)),
+        status: isNewSignup ? 'new' : 'duplicate',
+        utm_source: body.utm_source ?? null,
+        ip_country: ipCountry,
+        timestamp: new Date().toISOString(),
+      })
+    )
+
+    if (isNewSignup) {
+      const apiKey = c.env.RESEND_API_KEY
+      if (apiKey) {
+        const FROM = 'Silicon Crane <hello@mail.siliconcrane.com>'
+        const NOTIFY = 'smdurgan@venturecrane.com'
+        await Promise.allSettled([
+          sendResendEmail(apiKey, {
+            from: FROM,
+            to: email,
+            subject: 'You are on the Silicon Crane list',
+            text: `Welcome to Silicon Crane.
+
+You are on the early-access list for the Silicon Crane validation tooling - the platform we use to ship and measure structured product experiments (landing pages, priced waitlists, presales, service pilots, content magnets).
+
+We are in private alpha. We will be in touch when your spot opens.
+
+Until then: if you want help shipping a validation experiment now, the service side of Silicon Crane is open for engagement at https://siliconcrane.com.
+
+The Silicon Crane team`,
+            html: `<!doctype html><html><body style="font-family:system-ui,-apple-system,sans-serif;max-width:560px;margin:40px auto;padding:0 20px;color:#0f172a;line-height:1.6"><h1 style="font-size:22px;font-weight:600;color:#1e293b;margin:0 0 24px">Welcome to Silicon Crane.</h1><p>You are on the early-access list for the Silicon Crane validation tooling — the platform we use to ship and measure structured product experiments (landing pages, priced waitlists, presales, service pilots, content magnets).</p><p>We are in private alpha. We will be in touch when your spot opens.</p><p>Until then: if you want help shipping a validation experiment now, the service side of Silicon Crane is open for engagement at <a href="https://siliconcrane.com" style="color:#2563eb;text-decoration:none">siliconcrane.com</a>.</p><p style="margin-top:32px;color:#64748b;font-size:14px">The Silicon Crane team</p></body></html>`,
+          }),
+          sendResendEmail(apiKey, {
+            from: FROM,
+            to: NOTIFY,
+            subject: `[sc] new waitlist signup: ${email}`,
+            text: `New waitlist signup for Silicon Crane.
+
+Email: ${email}
+Country: ${ipCountry ?? 'unknown'}
+Source: ${body.utm_source ?? body.referrer ?? 'direct'}
+Landing: ${body.landing_path ?? '/'}
+
+Promote to allowlist: https://dashboard.clerk.com (Silicon Crane app > Settings > Restrictions > Allowlist)`,
+          }),
+        ]).then((results) => {
+          results.forEach((r, i) => {
+            if (r.status === 'rejected') {
+              console.error(
+                JSON.stringify({
+                  level: 'error',
+                  event: 'waitlist_email_failed',
+                  venture: 'sc',
+                  recipient_kind: i === 0 ? 'user' : 'notify',
+                  error: String(r.reason),
+                })
+              )
+            }
+          })
+        })
+      } else {
+        console.warn('waitlist: RESEND_API_KEY not configured; skipping confirmation email')
+      }
+    }
+
+    return c.json({
+      success: true,
+      data: { status: isNewSignup ? 'pending' : 'already_signed_up' },
+    })
+  } catch (err) {
+    console.error('waitlist error:', err)
+    return c.json(
+      {
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'An unexpected error occurred',
+          request_id: requestId,
+        },
+      },
+      500
+    )
+  }
+})
+
+async function verifyTurnstileToken(
+  secret: string,
+  token: string,
+  remoteIp?: string
+): Promise<boolean> {
+  if (!secret) return false
+  const form = new FormData()
+  form.append('secret', secret)
+  form.append('response', token)
+  if (remoteIp) form.append('remoteip', remoteIp)
+  try {
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: form,
+    })
+    const data = (await res.json()) as { success?: boolean }
+    return Boolean(data.success)
+  } catch {
+    return false
+  }
+}
+
+async function sendResendEmail(
+  apiKey: string,
+  msg: { from: string; to: string; subject: string; text: string; html?: string }
+): Promise<void> {
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify(msg),
+  })
+  if (!res.ok) {
+    throw new Error(`Resend ${res.status}: ${(await res.text().catch(() => '')).slice(0, 200)}`)
+  }
+}
+
+async function sha256Hex(input: string): Promise<string> {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+
 // POST /contact - Public contact form endpoint
 app.post('/contact', async (c) => {
   const requestId = c.get('requestId')
