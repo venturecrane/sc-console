@@ -1,0 +1,75 @@
+---
+import Base from '../../layouts/Base.astro';
+import { UserButton as ClerkUserButton } from '@clerk/astro/components';
+---
+
+<Base
+  title="Validation tooling | Silicon Crane"
+  description="Silicon Crane validation tooling preview."
+>
+  <main class="min-h-screen bg-slate-50">
+    <header class="bg-white border-b border-slate-200">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+        <a href="/" class="font-bold text-slate-900">Silicon Crane</a>
+        <ClerkUserButton />
+      </div>
+    </header>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+      <p class="text-xs uppercase tracking-widest text-blue-600 mb-3 font-mono">
+        Private alpha — validation tooling
+      </p>
+      <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
+        Welcome to the validation tooling.
+      </h1>
+      <p class="text-lg text-slate-600 max-w-2xl mb-12 leading-relaxed">
+        This is the operator surface we use to ship and measure structured product
+        experiments. You are seeing the alpha — features land here as we build them
+        for our own engagements.
+      </p>
+
+      <section class="grid gap-6 md:grid-cols-3">
+        <div class="bg-white rounded-xl p-6 border border-slate-200">
+          <h2 class="font-semibold text-slate-900 mb-2">Experiments</h2>
+          <p class="text-sm text-slate-600 leading-relaxed mb-4">
+            Distill brief, archetype, kill criteria, and copy pack — every experiment
+            tracked from hypothesis to decision memo.
+          </p>
+          <p class="text-xs text-slate-400 font-mono">archetype: waitlist | priced_waitlist | presale | service_pilot | content_magnet | concierge | interview</p>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 border border-slate-200">
+          <h2 class="font-semibold text-slate-900 mb-2">Leads</h2>
+          <p class="text-sm text-slate-600 leading-relaxed mb-4">
+            Every signup, every event, attributed to its experiment. Conversion
+            rates roll up to the lifecycle stage.
+          </p>
+          <p class="text-xs text-slate-400 font-mono">stages: draft → preflight → build → launch → run → decide → archive</p>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 border border-slate-200">
+          <h2 class="font-semibold text-slate-900 mb-2">Decisions</h2>
+          <p class="text-sm text-slate-600 leading-relaxed mb-4">
+            Decision memos, learning memos, kill-or-double-down. The output of the
+            experiment is the next decision, not just the data.
+          </p>
+          <p class="text-xs text-slate-400 font-mono">decision_memos | learning_memos</p>
+        </div>
+      </section>
+
+      <section class="mt-16 bg-white rounded-xl p-8 border border-slate-200">
+        <h2 class="text-xl font-bold text-slate-900 mb-3">In active development</h2>
+        <p class="text-slate-600 leading-relaxed mb-4">
+          The full UI for these flows is coming online iteratively. The data model
+          is live (sc-api `/experiments`, `/leads`, `/events`, `/metrics` endpoints
+          all serve real data). What you do not yet see in this preview, you can
+          reach via the API directly.
+        </p>
+        <p class="text-sm text-slate-500">
+          Have a hypothesis you want to validate?
+          <a href="mailto:launch@siliconcrane.com" class="text-blue-600 hover:underline">launch@siliconcrane.com</a>
+        </p>
+      </section>
+    </div>
+  </main>
+</Base>
