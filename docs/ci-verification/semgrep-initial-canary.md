@@ -87,7 +87,7 @@ NPM Audit: WARNING (pre-existing Astro v5 transitive vulnerabilities — informa
 
 Applied 2026-04-25 via `gh api --method POST /repos/venturecrane/sc-console/rulesets --input ~/dev/crane-console/config/github-ruleset-main-protection.json`
 
-**Ruleset ID:** (see below — appended after application)
+**Ruleset ID:** 15555250
 **Enforcement:** active
 **Required status checks:** `Security Summary` (the aggregate gate)
 
