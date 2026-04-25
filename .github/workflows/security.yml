@@ -29,9 +29,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version: '22'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@venturecrane'
+          cache: 'npm'
 
       - name: Install dependencies
         env:
@@ -122,9 +123,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version: '22'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@venturecrane'
+          cache: 'npm'
 
       - name: Install dependencies
         env:
@@ -145,9 +147,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version: '22'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@venturecrane'
+          cache: 'npm'
 
       - name: Install dependencies
         env:
