@@ -61,7 +61,13 @@ sc-console's `npm audit --audit-level=high` has been failing on `main` since 202
 
 ## CI run — canary removed (GREEN, post-fix)
 
-**Run:** (appended after push)
+**Run:** https://github.com/venturecrane/sc-console/actions/runs/24942517862
+
+- Secret Detection: PASSED
+- Static Analysis (Semgrep): PASSED
+- nosemgrep Justification Audit: PASSED
+- Security Summary: PASSED
+- NPM Audit: WARNING (pre-existing — informational only)
 
 ## Ruleset application
 
