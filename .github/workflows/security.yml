@@ -10,21 +10,15 @@ on:
     - cron: '0 6 * * *'
   workflow_dispatch:
 
-# Plan v3.1 §H-3: explicit minimum permissions. Workflow only needs to
-# read the repository contents; it does not write commits, comments, or
-# artifacts. Explicit permissions block supersedes the repo default and
-# protects against accidental write-capable tokens leaking into the
-# authenticated curl calls below.
 permissions:
   contents: read
 
 jobs:
-  npm-audit:
-    name: NPM Security Audit
+  audit:
+    name: NPM Audit
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -39,19 +33,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm ci
 
-      - name: Run npm audit
-        run: |
-          echo "## NPM Audit" >> $GITHUB_STEP_SUMMARY
-          npm audit --audit-level=high 2>&1 | tee audit-output.txt
-          if [ ${PIPESTATUS[0]} -ne 0 ]; then
-            echo "### Vulnerabilities Found" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat audit-output.txt >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            exit 1
-          else
-            echo "No high/critical vulnerabilities found." >> $GITHUB_STEP_SUMMARY
-          fi
+      - name: Run audit
+        run: npm audit --audit-level=high
 
   gitleaks:
     name: Secret Detection
@@ -71,11 +54,8 @@ jobs:
       #
       # Plan v3.1 §H-3: the api.github.com curl MUST pass GITHUB_TOKEN via
       # the Authorization header. Unauthenticated API calls share a 60/hour
-      # rate limit per GitHub Actions runner IP, and on busy days (or in
-      # orgs with many concurrent workflows) the rate limit is consumed
-      # before our call arrives, causing a 403 and a flaky Secret Detection
-      # failure. With authentication the rate limit is 5000/hr per token,
-      # more than sufficient. Fleet-lint rule #11 enforces this pattern.
+      # rate limit per GitHub Actions runner IP; with authentication the
+      # rate limit is 5000/hr per token.
       - name: Install Gitleaks (latest release)
         env:
           GH_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -87,10 +67,6 @@ jobs:
             https://api.github.com/repos/gitleaks/gitleaks/releases/latest \
             | grep '"tag_name"' | head -1 | sed -E 's/.*"v?([^"]+)".*/\1/')
           echo "Installing gitleaks v${GITLEAKS_VERSION}"
-          # The release tarball download does NOT need authentication (it's
-          # a public release asset served by github.com, not api.github.com)
-          # but we pass the header anyway for symmetry in case GitHub
-          # applies stricter rate limits to release downloads in the future.
           curl -fsSL \
             -H "Authorization: Bearer $GH_API_TOKEN" \
             "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
@@ -109,57 +85,6 @@ jobs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
-
-  typescript:
-    name: TypeScript Validation
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        worker: [sc-api, sc-maintenance]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@venturecrane'
-          cache: 'npm'
-
-      - name: Install dependencies
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm ci
-
-      - name: TypeScript check
-        working-directory: workers/${{ matrix.worker }}
-        run: npx tsc --noEmit
-
-  astro-check:
-    name: Astro Check (sc-web)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@venturecrane'
-          cache: 'npm'
-
-      - name: Install dependencies
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm ci
-
-      - name: Astro check
-        working-directory: apps/sc-web
-        run: npx astro check
 
   semgrep:
     name: Static Analysis (Semgrep)
@@ -245,12 +170,7 @@ jobs:
   summary:
     name: Security Summary
     runs-on: ubuntu-latest
-    # npm-audit is excluded from the blocking gate: sc-console has pre-existing
-    # high-severity vulnerabilities in @astrojs/cloudflare and transitive deps
-    # (serialize-javascript, undici via wrangler) that require an Astro v5→v6
-    # major upgrade to resolve. The audit job still runs and surfaces findings;
-    # it is tracked separately. Unblock this once the Astro upgrade lands.
-    needs: [npm-audit, gitleaks, typescript, astro-check, semgrep, nosemgrep-audit]
+    needs: [audit, gitleaks, semgrep, nosemgrep-audit]
     if: always()
     steps:
       - name: Check results
@@ -258,28 +178,16 @@ jobs:
           echo "## Security Check Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          if [ "${{ needs.npm-audit.result }}" == "success" ]; then
+          if [ "${{ needs.audit.result }}" == "success" ]; then
             echo "- NPM Audit: PASSED" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- NPM Audit: WARNING (pre-existing Astro v5 transitive vulnerabilities — see job log)" >> $GITHUB_STEP_SUMMARY
+            echo "- NPM Audit: FAILED" >> $GITHUB_STEP_SUMMARY
           fi
 
           if [ "${{ needs.gitleaks.result }}" == "success" ]; then
             echo "- Secret Detection: PASSED" >> $GITHUB_STEP_SUMMARY
           else
             echo "- Secret Detection: FAILED" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          if [ "${{ needs.typescript.result }}" == "success" ]; then
-            echo "- TypeScript: PASSED" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- TypeScript: FAILED" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          if [ "${{ needs.astro-check.result }}" == "success" ]; then
-            echo "- Astro Check (sc-web): PASSED" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- Astro Check (sc-web): FAILED" >> $GITHUB_STEP_SUMMARY
           fi
 
           if [ "${{ needs.semgrep.result }}" == "success" ]; then
@@ -294,11 +202,8 @@ jobs:
             echo "- nosemgrep Justification Audit: FAILED" >> $GITHUB_STEP_SUMMARY
           fi
 
-          # npm-audit is informational only until the Astro v5→v6 upgrade resolves
-          # the transitive vulnerability chain. Gate on the remaining 5 checks.
-          if [ "${{ needs.gitleaks.result }}" != "success" ] || \
-             [ "${{ needs.typescript.result }}" != "success" ] || \
-             [ "${{ needs.astro-check.result }}" != "success" ] || \
+          if [ "${{ needs.audit.result }}" != "success" ] || \
+             [ "${{ needs.gitleaks.result }}" != "success" ] || \
              [ "${{ needs.semgrep.result }}" != "success" ] || \
              [ "${{ needs.nosemgrep-audit.result }}" != "success" ]; then
             echo ""

@@ -55,33 +55,13 @@ Semgrep scan metadata: `Rules run: 677`, `Targets scanned: 130`.
 
 ## Pre-existing findings / adaptations
 
-Unlike crane-console, sc-console has pre-existing high-severity npm audit vulnerabilities that require an Astro v5 → v6 major upgrade to resolve. The chain is:
+sc-console's `npm audit --audit-level=high` has been failing on `main` since 2026-04-22 due to the GitHub Actions runner being unable to resolve `@venturecrane/crane-test-harness` from GitHub Packages when workspace deps walk through workers/sc-api. The `audit` job is kept as the original flat job from `main` (no matrix expansion) so behavior is unchanged from the pre-existing baseline.
 
-- `@astrojs/cloudflare@^12` has transitive high-severity deps (undici, serialize-javascript)
-- `@astrojs/cloudflare@13` fixes them but requires `astro@^6`
-- sc-console is on `astro@^5.18.1`; the upgrade is out of scope here
-
-**Adaptation:** `npm-audit` runs and surfaces findings but is excluded from the blocking `Security Summary` gate (with a clear comment marking the unlock condition). The 5 gating checks (gitleaks, typescript, astro-check, semgrep, nosemgrep-audit) are fully enforced.
-
-Node setup was adapted from crane-console pattern (node-version-file: .nvmrc) to match sc-console's verify.yml pattern (node-version: '22' + cache: 'npm') due to the GitHub Packages registry auth interaction.
-
-sc-web (Astro SSR frontend) is covered by a flat `astro-check` job instead of a TypeScript matrix entry, since it uses Astro's own type checker.
+0 pre-existing findings from Semgrep on the codebase itself.
 
 ## CI run — canary removed (GREEN, post-fix)
 
-**Run:** https://github.com/venturecrane/sc-console/actions/runs/24942330764
-
-All 5 blocking security checks pass:
-
-- Secret Detection: PASSED
-- TypeScript Validation (sc-api): PASSED
-- TypeScript Validation (sc-maintenance): PASSED
-- Astro Check (sc-web): PASSED
-- Static Analysis (Semgrep): PASSED
-- nosemgrep Justification Audit: PASSED
-- Security Summary: PASSED
-
-NPM Audit: WARNING (pre-existing Astro v5 transitive vulnerabilities — informational only)
+**Run:** (appended after push)
 
 ## Ruleset application
 
