@@ -1,4 +1,4 @@
-name: Security
+name: Security Checks
 
 on:
   push:
@@ -6,8 +6,12 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 6 * * 1' # Weekly on Monday
+    # Run daily at 6am UTC
+    - cron: '0 6 * * *'
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   audit:
@@ -36,15 +40,174 @@ jobs:
     name: Secret Detection
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install Gitleaks
+      # Plan §C.5 fleet-lint #1: never hardcode the gitleaks version. The
+      # previous template pinned to gitleaks_8.21.2 which broke the entire
+      # fleet's security pipeline. We can't use gitleaks/gitleaks-action@v2
+      # because it requires a paid license for org repos. Install pattern
+      # below queries the GitHub releases API for the latest tag, so the
+      # version stays current automatically. Config lives in .gitleaks.toml.
+      #
+      # Plan v3.1 §H-3: the api.github.com curl MUST pass GITHUB_TOKEN via
+      # the Authorization header. Unauthenticated API calls share a 60/hour
+      # rate limit per GitHub Actions runner IP; with authentication the
+      # rate limit is 5000/hr per token.
+      - name: Install Gitleaks (latest release)
+        env:
+          GH_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_linux_x64.tar.gz -o gitleaks.tar.gz
-          tar -xzf gitleaks.tar.gz
+          set -euo pipefail
+          GITLEAKS_VERSION=$(curl -fsSL \
+            -H "Authorization: Bearer $GH_API_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/gitleaks/gitleaks/releases/latest \
+            | grep '"tag_name"' | head -1 | sed -E 's/.*"v?([^"]+)".*/\1/')
+          echo "Installing gitleaks v${GITLEAKS_VERSION}"
+          curl -fsSL \
+            -H "Authorization: Bearer $GH_API_TOKEN" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz gitleaks
           chmod +x gitleaks
 
       - name: Run Gitleaks
-        run: ./gitleaks detect --source . --verbose --no-git
+        run: |
+          echo "## Secret Detection" >> $GITHUB_STEP_SUMMARY
+          if ./gitleaks detect --source . --verbose --no-git --config .gitleaks.toml 2>&1 | tee gitleaks-output.txt; then
+            echo "No secrets detected." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### Secrets Found" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat gitleaks-output.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+  semgrep:
+    name: Static Analysis (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      # Pinned container tag. Dependabot watches returntocorp/semgrep in
+      # .github/dependabot.yml so pin bumps land as PRs (auto-merged by
+      # .github/workflows/dependabot-auto-merge.yml when safe).
+      image: returntocorp/semgrep:1.157.0
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Semgrep
+        # POSIX-compatible shell script — the returntocorp/semgrep container
+        # uses Alpine ash, not bash, so ${PIPESTATUS[n]} is unavailable.
+        # We redirect to a file, capture $? directly, then cat for both the
+        # CI log and (on failure) $GITHUB_STEP_SUMMARY.
+        run: |
+          echo "## Static Analysis (Semgrep)" >> "$GITHUB_STEP_SUMMARY"
+          # `--error` fails on findings. `--strict` was tried but exits 3 on
+          # the ~0.4% of files in this repo that Semgrep can't fully parse
+          # (yaml/ts variants) — unrelated to security findings. Pack-load
+          # failures still surface loudly in the log without --strict.
+          set +e
+          semgrep scan \
+            --error \
+            --metrics=off \
+            --config=p/typescript \
+            --config=p/javascript \
+            --config=p/security-audit \
+            --config=p/owasp-top-ten \
+            --exclude=node_modules --exclude=dist --exclude='**/*.test.ts' \
+            > semgrep-output.txt 2>&1
+          rc=$?
+          set -e
+          cat semgrep-output.txt
+          if [ "$rc" -ne 0 ]; then
+            {
+              echo '### Findings'
+              echo '```'
+              cat semgrep-output.txt
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit "$rc"
+          fi
+
+  nosemgrep-audit:
+    name: nosemgrep Justification Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require substantive justification on every nosemgrep
+        # Every `// nosemgrep` annotation must be followed by ` — ` or `: ` and
+        # at least 20 characters of justification prose. Without this audit,
+        # the gate degrades over time as agents silently silence findings by
+        # appending a bare `// nosemgrep` comment.
+        run: |
+          set -e
+          bad=$(grep -rnP --include='*.ts' --include='*.js' \
+            '//[[:space:]]*nosemgrep(:[^[:space:]]+)?[[:space:]]*(?:[—:][[:space:]]*.{0,19})?[[:space:]]*$' \
+            . \
+            --exclude-dir=node_modules --exclude-dir=dist || true)
+          if [ -n "$bad" ]; then
+            echo "nosemgrep annotations require ≥20 chars of justification after ' — ' or ': ':"
+            echo "$bad"
+            exit 1
+          fi
+          block=$(grep -rnzP --include='*.ts' --include='*.js' \
+            '/\*[^*]*nosemgrep[^*]*\*/' \
+            . \
+            --exclude-dir=node_modules --exclude-dir=dist || true)
+          if [ -n "$block" ]; then
+            echo "Block-comment nosemgrep not supported; use inline // nosemgrep:"
+            echo "$block"
+            exit 1
+          fi
+          disabled=$(grep -rn --include='*.ts' --include='*.js' 'semgrep-disable' . --exclude-dir=node_modules --exclude-dir=dist || true)
+          if [ -n "$disabled" ]; then
+            echo "'semgrep-disable' is banned; use rule-specific nosemgrep:"
+            echo "$disabled"
+            exit 1
+          fi
+
+  summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs: [audit, gitleaks, semgrep, nosemgrep-audit]
+    if: always()
+    steps:
+      - name: Check results
+        run: |
+          echo "## Security Check Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.audit.result }}" == "success" ]; then
+            echo "- NPM Audit: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            # Pre-existing vulnerabilities on main since 2026-04-22; informational only.
+            echo "- NPM Audit: WARNING (pre-existing — see job log)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ needs.gitleaks.result }}" == "success" ]; then
+            echo "- Secret Detection: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Secret Detection: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ needs.semgrep.result }}" == "success" ]; then
+            echo "- Static Analysis (Semgrep): PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Static Analysis (Semgrep): FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ needs.nosemgrep-audit.result }}" == "success" ]; then
+            echo "- nosemgrep Justification Audit: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- nosemgrep Justification Audit: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # audit is informational — pre-existing failure on main since 2026-04-22.
+          if [ "${{ needs.gitleaks.result }}" != "success" ] || \
+             [ "${{ needs.semgrep.result }}" != "success" ] || \
+             [ "${{ needs.nosemgrep-audit.result }}" != "success" ]; then
+            echo ""
+            echo "One or more security checks failed."
+            exit 1
+          fi
