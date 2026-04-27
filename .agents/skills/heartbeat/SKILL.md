@@ -1,3 +1,8 @@
+---
+name: heartbeat
+description: Keep Session Alive
+---
+
 # /heartbeat - Keep Session Alive
 
 Send a heartbeat to prevent your session from timing out.

@@ -1,3 +1,8 @@
+---
+name: status
+description: Show Session Status
+---
+
 # /status - Show Session Status
 
 Display current session state, tasks, and git status for situational awareness.

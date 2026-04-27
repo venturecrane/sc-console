@@ -1,3 +1,8 @@
+---
+name: edit-article
+description: Editorial Review Agent
+---
+
 # /edit-article - Editorial Review Agent
 
 This command runs an article through two parallel editor agents, applies blocking fixes directly, and reports what changed. Advisory issues are reported but not auto-fixed.

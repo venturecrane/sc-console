@@ -1,3 +1,8 @@
+---
+name: code-review
+description: Codebase Review
+---
+
 # /code-review - Codebase Review
 
 Deep codebase review with multi-model perspectives. Produces a graded scorecard stored in VCMS and a full report committed to the repo.

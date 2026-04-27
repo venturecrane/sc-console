@@ -1,3 +1,8 @@
+---
+name: design-brief
+description: Multi-Agent Design Brief Generator
+---
+
 # /design-brief - Multi-Agent Design Brief Generator
 
 > **Invocation:** As your first action, call `crane_skill_invoked(skill_name: "design-brief")`. This is non-blocking — if the call fails, log the warning and continue. Usage data drives `/skill-audit`.
