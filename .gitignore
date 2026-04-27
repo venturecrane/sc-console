@@ -31,3 +31,8 @@ dist/
 .cache/
 .codex/
 .gemini/
+
+# Playwright
+playwright/.clerk/
+playwright-report/
+test-results/
