@@ -13,7 +13,7 @@
     "@astrojs/cloudflare": "^12.6.12",
     "@astrojs/tailwind": "^6.0.2",
     "@clerk/astro": "^3.0.19",
-    "astro": "^5.18.1",
+    "astro": "^6.1.6",
     "tailwindcss": "^3.4.19"
   },
   "devDependencies": {
