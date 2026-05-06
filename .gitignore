@@ -30,7 +30,14 @@ dist/
 .astro/
 .cache/
 .codex/
-.gemini/
+
+# Enterprise skill triplet synced from crane-console on every `crane sc` launch
+# (see syncVentureSkills in crane-console/packages/crane-mcp/src/cli/launch-lib.ts).
+# Source of truth lives in crane-console; tracking here would produce a
+# large dirty tree on every canon update.
+.claude/commands/
+.gemini/commands/
+.agents/skills/
 
 # Playwright
 playwright/.clerk/
